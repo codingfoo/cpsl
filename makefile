@@ -1,9 +1,11 @@
 all: lex.yy.c
-	gcc -o cpsllexer lex.yy.c -lfl
+	g++ -o cpsllexer lex.yy.c -lfl -ll -ly
 
 lex.yy.c: cpsl.l
 	flex cpsl.l
 
+tar: clean
+	tar -cvzf cpsl_bowen_masco.tgz cpsl.l makefile
 
 clean:
 	rm -f lex.yy.c
