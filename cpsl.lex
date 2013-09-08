@@ -1,9 +1,26 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+  extern "C"
+  {
+      int yylex(void);
+  }
 %}
+
+
 %{
-enum keyword {
+typedef union {
+  int int_val;
+  char char_val;
+  char *str_ptr;
+  char *name_ptr;
+} YYSTYPE;
+
+extern YYSTYPE yylval;
+%}
+
+%{
+enum terminals {
 ARRAY_KEYWORD,
 BEGIN_KEYWORD,
 CHR_KEYWORD,
@@ -25,17 +42,43 @@ DOWNTO_KEYWORD,
 FUNCTION_KEYWORD,
 READ_KEYWORD,
 THEN_KEYWORD,
-WRITE_KEYWORD
+WRITE_KEYWORD,
+IDENTIFIER,
+PLUS_OPERATOR,
+MINUS_OPERATOR,
+ASTERISK_OPERATOR,
+SLASH_OPERATOR,
+AMPERSAND_OPERATOR,
+BAR_OPERATOR,
+TILDE_OPERATOR,
+EQUAL_OPERATOR,
+NOT_EQUAL_OPERATOR,
+LESS_THAN_OPERATOR,
+LESS_THAN_OR_EQUAL_OPERATOR,
+GREATER_THAN_OPERATOR,
+GREATER_THAN_OR_EQUAL_OPERATOR,
+PERIOD_OPERATOR,
+COMMA_OPERATOR,
+COLON_OPERATOR,
+SEMICOLON_OPERATOR,
+OPEN_PAREN_OPERATOR,
+CLOSE_PAREN_OPERATOR,
+OPEN_BRACKET_OPERATOR,
+CLOSE_BRACKET_OPERATOR,
+ASSIGNS_OPERATOR,
+PERCENT_OPERATOR,
+INTEGER_CONSTANT,
+CHAR_CONSTANT,
+STRING_CONSTANT
 };
 %}
-digit [0-9]
-letter [a-zA-Z]
+
 %%
+
 array|ARRAY {return(ARRAY_KEYWORD);}
 begin|BEGIN {return(BEGIN_KEYWORD);}
 chr|CHR {return(CHR_KEYWORD);}
 const|CONST {return(CONST_KEYWORD);}
-
 do|DO {return(DO_KEYWORD);}
 end|END {return(END_KEYWORD);}
 for|FOR {return(FOR_KEYWORD);}
@@ -55,11 +98,47 @@ read|READ {return(READ_KEYWORD);}
 then|THEN {return(THEN_KEYWORD);}
 write|WRITE {return(WRITE_KEYWORD);}
 
+[a-zA-Z][a-zA-Z0-9_]* {yylval.name_ptr = strdup(yytext); return(IDENTIFIER);}
+
+"+"  {return(PLUS_OPERATOR);}
+"−"  {return(MINUS_OPERATOR);}
+"∗"  {return(ASTERISK_OPERATOR);}
+"/"  {return(SLASH_OPERATOR);}
+"&"  {return(AMPERSAND_OPERATOR);}
+"|"  {return(BAR_OPERATOR);}
+"~"  {return(TILDE_OPERATOR);}
+"="  {return(EQUAL_OPERATOR);}
+"<>" {return(NOT_EQUAL_OPERATOR);}
+"<"  {return(LESS_THAN_OPERATOR);}
+"<=" {return(LESS_THAN_OR_EQUAL_OPERATOR);}
+">"  {return(GREATER_THAN_OPERATOR);}
+">=" {return(GREATER_THAN_OR_EQUAL_OPERATOR);}
+"."  {return(PERIOD_OPERATOR);}
+","  {return(COMMA_OPERATOR);}
+":"  {return(COLON_OPERATOR);}
+";"  {return(SEMICOLON_OPERATOR);}
+"("  {return(OPEN_PAREN_OPERATOR);}
+")"  {return(CLOSE_PAREN_OPERATOR);}
+"["  {return(OPEN_BRACKET_OPERATOR);}
+"]"  {return(CLOSE_BRACKET_OPERATOR);}
+":=" {return(ASSIGNS_OPERATOR);}
+"%"  {return(PERCENT_OPERATOR);}
+
+0x[1-9][0-9]* {yylval.int_val = atoi(yytext); return(INTEGER_CONSTANT);}
+0[1-9][0-9]* {yylval.int_val = atoi(yytext); return(INTEGER_CONSTANT);}
+[0-9]* {yylval.int_val = atoi(yytext); return(INTEGER_CONSTANT);}
+
+'[a-zA-Z]' {yylval.char_val = yytext[0]; return(CHAR_CONSTANT);}
+
+"[a-zA-Z]*" {yylval.str_ptr = strdup(yytext); return(STRING_CONSTANT);}
+
+'' {printf("ILLEGAL CHARACTER CONSTANT");}
+
 . {printf("ILLEGAL CHARACTER");}
+
 %%
+
 int main(int argc, char* argv[]) {
-  yylex() ;
-  return 0 ;
+  yylex();
+  return 0;
 }
-
-
