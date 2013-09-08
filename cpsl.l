@@ -34,7 +34,7 @@ void yyerror(const char *s)
 
 %{
 enum terminals {
-ARRAY_KEYWORD,
+ARRAY_KEYWORD=1,
 BEGIN_KEYWORD,
 CHR_KEYWORD,
 CONST_KEYWORD,
@@ -85,6 +85,10 @@ CHAR_CONSTANT,
 STRING_CONSTANT
 };
 %}
+
+%option debug
+%option nodefault
+%option warn
 
 %%
 
@@ -137,7 +141,7 @@ write|WRITE {return(WRITE_KEYWORD);}
 ":=" {return(ASSIGNS_OPERATOR);}
 "%"  {return(PERCENT_OPERATOR);}
 
-0x[1-9A-F][0-9A-F]* {yylval.int_val = atoi(yytext); printf("%d", yylval.int_val); return(INTEGER_CONSTANT);}
+0x[1-9A-F][0-9A-F]* {yylval.int_val = atoi(yytext); return(INTEGER_CONSTANT);}
 0[1-7][0-7]* {yylval.int_val = atoi(yytext); return(INTEGER_CONSTANT);}
 [0-9][0-9]* {yylval.int_val = atoi(yytext); return(INTEGER_CONSTANT);}
 
@@ -147,15 +151,24 @@ write|WRITE {return(WRITE_KEYWORD);}
 
 "$".*[\n]     // Ignore one-line comments
 
-[ \t\n]+      // Ignore whitespace
+[ \t\n]      // Ignore whitespace
 
 '' {yyerror("Illegal character constant: A Character constant must not be blank.");}
 
-. {yyerror("ILLEGAL CHARACTER");}
+. {yyerror("Unrecognized character.");}
 
 %%
 
 int main(int argc, char* argv[]) {
-  yylex();
-  return 0;
+  ++argv, --argc; // ignore program name
+  if ( argc > 0 )
+  {
+    yyin = fopen( argv[0], "r" );
+  }
+  else
+  {
+    yyin = stdin;
+  }
+
+  while( yylex() ) {}
 }
