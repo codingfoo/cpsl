@@ -1,8 +1,8 @@
 all: lex.yy.c
 	gcc -o cpsllexer lex.yy.c -lfl
 
-lex.yy.c: cpsl.lex
-	flex cpsl.lex
+lex.yy.c: cpsl.l
+	flex cpsl.l
 
 
 clean:
