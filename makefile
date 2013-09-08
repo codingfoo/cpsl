@@ -1,8 +1,12 @@
 all: lex.yy.c
-	g++ -o cpsllexer lex.yy.c -lfl
+	gcc -o cpsllexer lex.yy.c -lfl
 
 lex.yy.c: cpsl.lex
 	flex cpsl.lex
 
+
 clean:
-	rm -rf lex.yy.c
+	rm -f lex.yy.c
+	rm -f cpsllexer
+	rm -f cpsl.tab.c
+	rm -f cpsl.tab.h
