@@ -90,6 +90,8 @@ STRING_CONSTANT
 %option nodefault
 %option warn
 
+%x IN_CHAR_CONSTANT
+
 %%
 
 array|ARRAY {return(ARRAY_KEYWORD);}
@@ -118,7 +120,7 @@ write|WRITE {return(WRITE_KEYWORD);}
 [a-zA-Z][a-zA-Z0-9_]* {yylval.identifier_ptr = strdup(yytext); return(IDENTIFIER);}
 
 "+"  {return(PLUS_OPERATOR);}
-"−"  {return(MINUS_OPERATOR);}
+"-"  {return(MINUS_OPERATOR);}
 "∗"  {return(ASTERISK_OPERATOR);}
 "/"  {return(SLASH_OPERATOR);}
 "&"  {return(AMPERSAND_OPERATOR);}
@@ -141,17 +143,23 @@ write|WRITE {return(WRITE_KEYWORD);}
 ":=" {return(ASSIGNS_OPERATOR);}
 "%"  {return(PERCENT_OPERATOR);}
 
-0x[1-9A-F][0-9A-F]* {yylval.int_val = atoi(yytext); return(INTEGER_CONSTANT);}
-0[1-7][0-7]* {yylval.int_val = atoi(yytext); return(INTEGER_CONSTANT);}
-[0-9][0-9]* {yylval.int_val = atoi(yytext); return(INTEGER_CONSTANT);}
+0x[0-9A-F]* {yylval.int_val = strtol(yytext, (char **) NULL, 16); return(INTEGER_CONSTANT);}
+0[0-7]* {yylval.int_val = strtol(yytext, (char **) NULL, 8); return(INTEGER_CONSTANT);}
+[0-9][0-9]* {yylval.int_val = strtol(yytext, (char **) NULL, 10); return(INTEGER_CONSTANT);}
 
-'[a-zA-Z]' {yylval.char_val = yytext[1]; return(CHAR_CONSTANT);}
+'           { BEGIN(IN_CHAR_CONSTANT); }
+<IN_CHAR_CONSTANT>{
+\n           {yyerror("Newline is not allowed in a character constant. Constant maybe unclosed."); BEGIN INITIAL;}
+[[:print:]]' {yylval.char_val = yytext[0]; BEGIN INITIAL; return(CHAR_CONSTANT);}
+. {yyerror("Malformed character constant."); BEGIN INITIAL;}
+}
 
-\"[a-zA-Z]*\" {yylval.str_ptr = strdup(yytext); return(STRING_CONSTANT);}
+\"[[:print:]]*\" {yylval.str_ptr = strdup(yytext); return(STRING_CONSTANT);}
 
 "$".*[\n]     // Ignore one-line comments
 
-[ \t\n]      // Ignore whitespace
+[ \t]      // Ignore whitespace
+\n              yylineno++;
 
 '' {yyerror("Illegal character constant: A Character constant must not be blank.");}
 
