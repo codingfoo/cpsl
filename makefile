@@ -1,5 +1,6 @@
 all: lex.yy.c
 	g++ -o cpsllexer lex.yy.c -lfl -ll -ly
+	./cpsllexer test.cpsl
 
 lex.yy.c: cpsl.l
 	flex cpsl.l
