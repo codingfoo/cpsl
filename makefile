@@ -1,6 +1,10 @@
-all: lex.yy.c
-	g++ -o cpsllexer lex.yy.c -lfl -ll -ly
+all: build
+
+test: build
 	./cpsllexer test.cpsl
+
+build: lex.yy.c
+	g++ -o cpsllexer lex.yy.c -lfl -ll -ly
 
 lex.yy.c: cpsl.l
 	flex cpsl.l
