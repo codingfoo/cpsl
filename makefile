@@ -1,9 +1,12 @@
 all: build
 
-test: build
-	./cpsl_lexer test.cpsl
-
 build: lex.yy.c
+	clang++ -std=c++11 -stdlib=libc++ lex.yy.c -o cpsl_lexer
+
+test_lex: build_lex
+	./cpsl_lexer test/lex.cpsl
+
+build_lex: lex.yy.c
 	clang++ -std=c++11 -stdlib=libc++ lex.yy.c -o cpsl_lexer
 
 lex.yy.c: cpsl.lex
