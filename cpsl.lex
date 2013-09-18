@@ -1,3 +1,8 @@
+%option warn
+%option debug
+%option nodefault
+%option noyywrap
+
 %{
 #include <string>
 #include "cpsl.h"
@@ -32,36 +37,32 @@ void yyerror(const char *s)
 }
 %}
 
-%option debug
-%option nodefault
-%option warn
-
 %x IN_CHAR_CONSTANT
 
 %%
 
-[array|ARRAY] {return(ARRAY_KEYWORD);}
-[begin|BEGIN] {return(BEGIN_KEYWORD);}
-[chr|CHR] {return(CHR_KEYWORD);}
-[const|CONST] {return(CONST_KEYWORD);}
-[do|DO] {return(DO_KEYWORD);}
-[end|END] {return(END_KEYWORD);}
-[for|FOR] {return(FOR_KEYWORD);}
-[forward|FORWARD] {return(FORWARD_KEYWORD);}
-[ord|ORD] {return(ORD_KEYWORD);}
-[pred|PRED] {return(PRED_KEYWORD);}
-[procedure|PROCEDURE] {return(PROCEDURE_KEYWORD);}
-[return|RETURN] {return(RETURN_KEYWORD);}
-[stop|STOP] {return(STOP_KEYWORD);}
-[succ|SUCC] {return(SUCC_KEYWORD);}
-[until|UNTIL] {return(UNTIL_KEYWORD);}
-[var|VAR] {return(VAR_KEYWORD);}
-[while|WHILE] {return(WHILE_KEYWORD);}
-[downto|DOWNTO] {return(DOWNTO_KEYWORD);}
-[function|FUNCTION] {return(FUNCTION_KEYWORD);}
-[read|READ] {return(READ_KEYWORD);}
-[then|THEN] {return(THEN_KEYWORD);}
-[write|WRITE] {return(WRITE_KEYWORD);}
+array|ARRAY {return(ARRAY_KEYWORD);}
+begin|BEGIN {return(BEGIN_KEYWORD);}
+chr|CHR {return(CHR_KEYWORD);}
+const|CONST {return(CONST_KEYWORD);}
+do|DO {return(DO_KEYWORD);}
+end|END {return(END_KEYWORD);}
+for|FOR {return(FOR_KEYWORD);}
+forward|FORWARD {return(FORWARD_KEYWORD);}
+ord|ORD {return(ORD_KEYWORD);}
+pred|PRED {return(PRED_KEYWORD);}
+procedure|PROCEDURE {return(PROCEDURE_KEYWORD);}
+return|RETURN {return(RETURN_KEYWORD);}
+stop|STOP {return(STOP_KEYWORD);}
+succ|SUCC {return(SUCC_KEYWORD);}
+until|UNTIL {return(UNTIL_KEYWORD);}
+var|VAR {return(VAR_KEYWORD);}
+while|WHILE {return(WHILE_KEYWORD);}
+downto|DOWNTO {return(DOWNTO_KEYWORD);}
+function|FUNCTION {return(FUNCTION_KEYWORD);}
+read|READ {return(READ_KEYWORD);}
+then|THEN {return(THEN_KEYWORD);}
+write|WRITE {return(WRITE_KEYWORD);}
 
 [[:alpha:]][[:alnum:]_]* {yylval.identifier_ptr = strdup(yytext); return(IDENTIFIER);}
 
@@ -90,24 +91,25 @@ void yyerror(const char *s)
 "%"  {return(PERCENT_OPERATOR);}
 
 0x[0-9a-fA-F]* {yylval.int_val = std::stoi(yytext, 0, 0); return(INTEGER_CONSTANT);}
-0[0-7]* {yylval.int_val = std::stoi(yytext,0, 0); return(INTEGER_CONSTANT);}
-[0-9][0-9]* {yylval.int_val = std::stoi(yytext, 0, 0); return(INTEGER_CONSTANT);}
+0[0-7]*        {yylval.int_val = std::stoi(yytext, 0, 0); return(INTEGER_CONSTANT);}
+[0-9][0-9]*    {yylval.int_val = std::stoi(yytext, 0, 0); return(INTEGER_CONSTANT);}
 
 '           { BEGIN(IN_CHAR_CONSTANT); }
 <IN_CHAR_CONSTANT>{
-\n           {yyerror("Newline is not allowed in a character constant. Constant maybe unclosed."); BEGIN INITIAL;}
+\n           {yyerror("Newline is not allowed in a character constant. Constant may be unclosed."); yylineno++; BEGIN INITIAL;}
 [[:print:]]' {yylval.char_val = yytext[0]; BEGIN INITIAL; return(CHAR_CONSTANT);}
 . {yyerror("Malformed character constant."); BEGIN INITIAL;}
 }
 
 \"[[:print:]]*\" {yylval.str_ptr = strdup(yytext); return(STRING_CONSTANT);}
 
-"$".*[\n]     // Ignore one-line comments
+"$".*[\n]     yylineno++;// Ignore one-line comments
 
-[ \t]      // Ignore whitespace
-\n              yylineno++;
+[ ]        // Ignore whitespace
+\t         // Ignore whitespace
+\n         yylineno++;
 
-'' {yyerror("Illegal character constant: A Character constant must not be blank.");}
+'' {yyerror("Illegal character constant: A character constant must not be empty.");}
 
 . {yyerror("Unrecognized character.");}
 

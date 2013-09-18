@@ -1,19 +1,19 @@
 all: build
 
 test: build
-	./cpsllexer test.cpsl
+	./cpsl_lexer test.cpsl
 
 build: lex.yy.c
-	g++ -o cpsllexer lex.yy.c -lfl -ll -ly
+	clang++ -std=c++11 -stdlib=libc++ lex.yy.c -o cpsl_lexer
 
-lex.yy.c: cpsl.l
-	flex cpsl.l
+lex.yy.c: cpsl.lex
+	flex cpsl.lex
 
 tar: clean
-	tar -cvzf cpsl_bowen_masco.tgz cpsl.l makefile
+	tar -cvzf cpsl_bowen_masco.tgz cpsl.lex makefile
 
 clean:
 	rm -f lex.yy.c
-	rm -f cpsllexer
+	rm -f cpsl_lexer
 	rm -f cpsl.tab.c
 	rm -f cpsl.tab.h
