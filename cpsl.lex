@@ -74,11 +74,8 @@ write|WRITE {return(WRITE_KEYWORD);}
 "|"  {return(BAR_OPERATOR);}
 "~"  {return(TILDE_OPERATOR);}
 "="  {return(EQUAL_OPERATOR);}
-"<>" {return(NOT_EQUAL_OPERATOR);}
 "<"  {return(LESS_THAN_OPERATOR);}
-"<=" {return(LESS_THAN_OR_EQUAL_OPERATOR);}
 ">"  {return(GREATER_THAN_OPERATOR);}
-">=" {return(GREATER_THAN_OR_EQUAL_OPERATOR);}
 "."  {return(PERIOD_OPERATOR);}
 ","  {return(COMMA_OPERATOR);}
 ":"  {return(COLON_OPERATOR);}
@@ -87,8 +84,11 @@ write|WRITE {return(WRITE_KEYWORD);}
 ")"  {return(CLOSE_PAREN_OPERATOR);}
 "["  {return(OPEN_BRACKET_OPERATOR);}
 "]"  {return(CLOSE_BRACKET_OPERATOR);}
-":=" {return(ASSIGNS_OPERATOR);}
 "%"  {return(PERCENT_OPERATOR);}
+">=" {return(GREATER_THAN_OR_EQUAL_OPERATOR);}
+"<=" {return(LESS_THAN_OR_EQUAL_OPERATOR);}
+"<>" {return(NOT_EQUAL_OPERATOR);}
+":=" {return(ASSIGNS_OPERATOR);}
 
 0x[0-9a-fA-F]* {yylval.int_val = std::stoi(yytext, 0, 0); return(INTEGER_CONSTANT);}
 0[0-7]*        {yylval.int_val = std::stoi(yytext, 0, 0); return(INTEGER_CONSTANT);}
@@ -96,20 +96,24 @@ write|WRITE {return(WRITE_KEYWORD);}
 
 '           { BEGIN(IN_CHAR_CONSTANT); }
 <IN_CHAR_CONSTANT>{
-\n           {yyerror("Newline is not allowed in a character constant. Constant may be unclosed."); yylineno++; BEGIN INITIAL;}
-[[:print:]]' {yylval.char_val = yytext[0]; BEGIN INITIAL; return(CHAR_CONSTANT);}
-. {yyerror("Malformed character constant."); BEGIN INITIAL;}
+\\n'          {yylval.char_val = '\n'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
+\\r'          {yylval.char_val = '\r'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
+\\b'          {yylval.char_val = '\b'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
+\\t'          {yylval.char_val = '\t'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
+\\f'          {yylval.char_val = '\f'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
+[[:print:]]' {yylval.char_val = yytext[0]; BEGIN(INITIAL); return(CHAR_CONSTANT);}
+' {yyerror("Invalid character constant: A character constant must not be empty."); BEGIN(INITIAL);}
+\n           {yyerror("Invalid Character constant: Newline is not allowed in a character constant. Constant may be unclosed."); yylineno++; BEGIN(INITIAL);}
+. {yyerror("Invalid Character constant: Invalid character or more than a single represented character."); BEGIN(INITIAL);}
 }
 
-\"[[:print:]]*\" {yylval.str_ptr = strdup(yytext); return(STRING_CONSTANT);}
+\"[^\"\r\n]*\" {yylval.str_ptr = strdup(yytext); return(STRING_CONSTANT);}
 
 "$".*[\n]     yylineno++;// Ignore one-line comments
 
 [ ]        // Ignore whitespace
 \t         // Ignore whitespace
 \n         yylineno++;
-
-'' {yyerror("Illegal character constant: A character constant must not be empty.");}
 
 . {yyerror("Unrecognized character.");}
 
