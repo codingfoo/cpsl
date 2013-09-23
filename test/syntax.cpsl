@@ -1,0 +1,15 @@
+$ Program to sort personnel data
+
+const
+  TABLEN = 20;
+  NAMELEN = 24;
+
+type
+  ntype = array[1:NAMELEN] of char;
+  ptype = record
+    age : integer;
+    name : ntype;
+  end;
+
+begin
+end.
