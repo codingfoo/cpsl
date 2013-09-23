@@ -1,36 +1,15 @@
 %option warn
-%option debug
+/*%option debug*/
 %option nodefault
 %option noyywrap
 
 %{
 #include <string>
-#include "cpsl.h"
+#include "cpsl.tab.h"
 %}
 
 %{
-extern "C"
-{
-  int yylex(void);
-}
-%}
-
-
-%{
-typedef union {
-  int int_val;
-  char char_val;
-  char *str_ptr;
-  char *identifier_ptr;
-} YYSTYPE;
-
-extern "C"
-{
-  YYSTYPE yylval;
-}
-%}
-
-%{
+#define YY_DECL extern "C" int yylex()
 void yyerror(const char *s)
 {
       printf("%d: %s\n", yylineno, s);
@@ -46,45 +25,53 @@ begin|BEGIN {return(BEGIN_KEYWORD);}
 chr|CHR {return(CHR_KEYWORD);}
 const|CONST {return(CONST_KEYWORD);}
 do|DO {return(DO_KEYWORD);}
+downto|DOWNTO {return(DOWNTO_KEYWORD);}
+else|ELSE {return(ELSE_KEYWORD);}
+elseif|ELSEIF {return(ELSEIF_KEYWORD);}
 end|END {return(END_KEYWORD);}
 for|FOR {return(FOR_KEYWORD);}
 forward|FORWARD {return(FORWARD_KEYWORD);}
+function|FUNCTION {return(FUNCTION_KEYWORD);}
+if|IF {return(IF_KEYWORD);}
+of|OF {return(OF_KEYWORD);}
 ord|ORD {return(ORD_KEYWORD);}
 pred|PRED {return(PRED_KEYWORD);}
 procedure|PROCEDURE {return(PROCEDURE_KEYWORD);}
+read|READ {return(READ_KEYWORD);}
+record|RECORD {return(RECORD_KEYWORD);}
+repeat|REPEAT {return(REPEAT_KEYWORD);}
 return|RETURN {return(RETURN_KEYWORD);}
 stop|STOP {return(STOP_KEYWORD);}
 succ|SUCC {return(SUCC_KEYWORD);}
+then|THEN {return(THEN_KEYWORD);}
+to|TO {return(TO_KEYWORD);}
+type|TYPE {return(TYPE_KEYWORD);}
 until|UNTIL {return(UNTIL_KEYWORD);}
 var|VAR {return(VAR_KEYWORD);}
 while|WHILE {return(WHILE_KEYWORD);}
-downto|DOWNTO {return(DOWNTO_KEYWORD);}
-function|FUNCTION {return(FUNCTION_KEYWORD);}
-read|READ {return(READ_KEYWORD);}
-then|THEN {return(THEN_KEYWORD);}
 write|WRITE {return(WRITE_KEYWORD);}
 
 [[:alpha:]][[:alnum:]_]* {yylval.identifier_ptr = strdup(yytext); return(IDENTIFIER);}
 
-"+"  {return(PLUS_OPERATOR);}
-"-"  {return(MINUS_OPERATOR);}
-"∗"  {return(ASTERISK_OPERATOR);}
-"/"  {return(SLASH_OPERATOR);}
-"&"  {return(AMPERSAND_OPERATOR);}
-"|"  {return(BAR_OPERATOR);}
-"~"  {return(TILDE_OPERATOR);}
-"="  {return(EQUAL_OPERATOR);}
-"<"  {return(LESS_THAN_OPERATOR);}
-">"  {return(GREATER_THAN_OPERATOR);}
-"."  {return(PERIOD_OPERATOR);}
-","  {return(COMMA_OPERATOR);}
-":"  {return(COLON_OPERATOR);}
-";"  {return(SEMICOLON_OPERATOR);}
-"("  {return(OPEN_PAREN_OPERATOR);}
-")"  {return(CLOSE_PAREN_OPERATOR);}
-"["  {return(OPEN_BRACKET_OPERATOR);}
-"]"  {return(CLOSE_BRACKET_OPERATOR);}
-"%"  {return(PERCENT_OPERATOR);}
+"+"  {return(yytext[0]);}
+"-"  {return(yytext[0]);}
+"∗"  {return(yytext[0]);}
+"/"  {return(yytext[0]);}
+"&"  {return(yytext[0]);}
+"|"  {return(yytext[0]);}
+"~"  {return(yytext[0]);}
+"="  {return(yytext[0]);}
+"<"  {return(yytext[0]);}
+">"  {return(yytext[0]);}
+"."  {return(yytext[0]);}
+","  {return(yytext[0]);}
+":"  {return(yytext[0]);}
+";"  {return(yytext[0]);}
+"("  {return(yytext[0]);}
+")"  {return(yytext[0]);}
+"["  {return(yytext[0]);}
+"]"  {return(yytext[0]);}
+"%"  {return(yytext[0]);}
 ">=" {return(GREATER_THAN_OR_EQUAL_OPERATOR);}
 "<=" {return(LESS_THAN_OR_EQUAL_OPERATOR);}
 "<>" {return(NOT_EQUAL_OPERATOR);}
@@ -118,19 +105,3 @@ write|WRITE {return(WRITE_KEYWORD);}
 . {yyerror("Unrecognized character.");}
 
 %%
-
-int main(int argc, char* argv[]) {
-  ++argv, --argc; // ignore program name
-  if ( argc > 0 )
-  {
-    yyin = fopen( argv[0], "r" );
-  }
-  else
-  {
-    yyin = stdin;
-  }
-
-  while( yylex() ) {}
-
-  return 0;
-}
