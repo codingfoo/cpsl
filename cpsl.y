@@ -94,7 +94,11 @@ ident_list: IDENTIFIER
 
 array_type: ARRAY_KEYWORD '[' const_expression ':' const_expression ']' OF_KEYWORD type
 
-var_decl:
+var_decl: VAR_KEYWORD var_statement
+          |
+
+var_statement: ident_list ':' type ';'
+               | var_statement ident_list ':' type ';'
 
 routine: routine procedure_decl
          | routine function_decl

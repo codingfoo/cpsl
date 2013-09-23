@@ -11,5 +11,9 @@ type
     name : ntype;
   end;
 
+var
+  table : array[1:TABLEN] of ptype;
+  persons : integer;
+
 begin
 end.
