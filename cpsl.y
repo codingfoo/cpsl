@@ -56,6 +56,9 @@ void yyerror(const char *s);
 %token <str_ptr> STRING_CONSTANT
 %token <int_val> INTEGER_CONSTANT
 
+%verbose
+%debug
+
 %%
 
 program: constant_decl
@@ -100,15 +103,43 @@ var_decl: VAR_KEYWORD var_statement
 var_statement: ident_list ':' type ';'
                | var_statement ident_list ':' type ';'
 
-routine: routine procedure_decl
+routine: | procedure_decl
+         | function_decl
+         | routine procedure_decl
          | routine function_decl
          |
 
-procedure_decl: PROCEDURE_KEYWORD
+procedure_decl: PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
+               | PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' body ';'
 
-function_decl: FUNCTION_KEYWORD
+function_decl: FUNCTION_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
+               | FUNCTION_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' body ';'
 
-block: BEGIN_KEYWORD END_KEYWORD
+formal_parameters: optional_var ident_list ':' type
+                   | formal_parameters optional_var ident_list ':' type
+                   |
+
+optional_var: VAR_KEYWORD
+              |
+
+body: constant_decl type_decl var_decl block
+
+block: BEGIN_KEYWORD statement_sequence END_KEYWORD
+
+statement_sequence: statement
+                    | statement_sequence ';' statement
+
+statement: assignment
+
+assignment: lvalue ASSIGNS_OPERATOR expression
+
+lvalue: IDENTIFIER
+        | IDENTIFIER '.' IDENTIFIER
+        | IDENTIFIER '[' expression ']'
+
+expression: const_expression
+            | lvalue
+
 
 const_expression: INTEGER_CONSTANT
                   | IDENTIFIER

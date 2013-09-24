@@ -15,5 +15,20 @@ var
   table : array[1:TABLEN] of ptype;
   persons : integer;
 
+function exchname (var a,b:ntype) : boolean;
+  var
+    i:integer;
 begin
+  for i := 1 to NAMELEN do
+    if a[i] > b[i]
+      then return true;
+    elseif a[i] < b[i]
+      then return false;
+    end;
+  end;
+  return false;
+end;
+
+begin
+return false;
 end.
