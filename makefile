@@ -18,8 +18,8 @@ lex.yy.c: cpsl.lex cpsl.tab.h
 cpsl.tab.c cpsl.tab.h: cpsl.y
 	bison -d cpsl.y
 
-tar: clean
-	tar -cvzf cpsl_bowen_masco.tgz cpsl.lex makefile
+zip: clean
+	zip cpsl_bowen_masco.zip cpsl.lex cpsl.y makefile
 
 clean:
 	rm -f lex.yy.c
@@ -28,3 +28,4 @@ clean:
 	rm -f cpsl.tab.c
 	rm -f cpsl.tab.h
 	rm -f cpsl
+	rm -f cpsl.output
