@@ -60,6 +60,13 @@ void yyerror(const char *s);
 %token <str_ptr> STRING_CONSTANT
 %token <int_val> INTEGER_CONSTANT
 
+%right NEG
+%left '*' '/' '%'
+%left '+' '-'
+%nonassoc '=' NOT_EQUAL_OPERATOR '<' LESS_THAN_OR_EQUAL_OPERATOR '>' GREATER_THAN_OR_EQUAL_OPERATOR
+%right '~'
+%left '&'
+%left '|'
 
 %%
 
@@ -224,7 +231,7 @@ expression: expression '|' expression
             | expression '/' expression
             | expression '%' expression
             | '~' expression
-            | '-' expression
+            | '-' expression  %prec NEG
             | '(' expression ')'
             | IDENTIFIER '(' inside_expr ')'
             | CHR_KEYWORD '(' expression ')'
