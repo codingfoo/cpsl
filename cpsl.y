@@ -1,3 +1,7 @@
+%verbose
+%debug
+%error-verbose
+
 %{
 #include <string>
 extern "C"
@@ -56,9 +60,6 @@ void yyerror(const char *s);
 %token <str_ptr> STRING_CONSTANT
 %token <int_val> INTEGER_CONSTANT
 
-%verbose
-%debug
-%error-verbose
 
 %%
 
