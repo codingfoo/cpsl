@@ -135,22 +135,22 @@ routine: procedure_decl
          |
          ;
 
-procedure_decl: PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' FORWARD_KEYWORD ';'
-                | PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' body ';'
+procedure_decl: PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' procedure_decl_postfix
                 ;
+
+procedure_decl_postfix: FORWARD_KEYWORD ';'
+                        | body ';'
+                        ;
 
 function_decl: FUNCTION_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
                | FUNCTION_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' body ';'
                ;
 
-formal_parameters: optional_var ident_list ':' type
-                   | formal_parameters optional_var ident_list ':' type
+formal_parameters: VAR_KEYWORD ident_list ':' type
+                   | ident_list ':' type
+                   | formal_parameters ident_list ':' type
                    |
                    ;
-
-optional_var: VAR_KEYWORD
-              |
-              ;
 
 body: constant_decl type_decl var_decl block ;
 
@@ -219,13 +219,6 @@ procedurecall: IDENTIFIER '(' inner_write ')';
 
 nullstatement: ;
 
-lvalue: IDENTIFIER lvalue_sub
-
-lvalue_sub: | lvalue_sub '.' IDENTIFIER
-            | lvalue_sub '[' expression ']'
-            |
-            ;
-
 expression: expression '|' expression
             | expression '&' expression
             | expression '=' expression
@@ -248,7 +241,6 @@ expression: expression '|' expression
             | PRED_KEYWORD '(' expression ')'
             | SUCC_KEYWORD '(' expression ')'
             | const_expression
-            | lvalue
             ;
 
 inside_expr: expression
@@ -256,36 +248,18 @@ inside_expr: expression
              |
              ;
 
-const_expression: const_expression '|' const_expression
-                  | const_expression '&' const_expression
-                  | const_expression '=' const_expression
-                  | const_expression NOT_EQUAL_OPERATOR const_expression
-                  | const_expression LESS_THAN_OR_EQUAL_OPERATOR const_expression
-                  | const_expression GREATER_THAN_OR_EQUAL_OPERATOR const_expression
-                  | const_expression '<' const_expression
-                  | const_expression '>' const_expression
-                  | const_expression '+' const_expression
-                  | const_expression '-' const_expression
-                  | const_expression '*' const_expression
-                  | const_expression '/' const_expression
-                  | const_expression '%' const_expression
-                  | '~' const_expression
-                  | '-' const_expression
-                  | '(' const_expression ')'
-                  | IDENTIFIER '(' inside_const_expr ')'
-                  | CHR_KEYWORD '(' const_expression ')'
-                  | ORD_KEYWORD '(' const_expression ')'
-                  | PRED_KEYWORD '(' const_expression ')'
-                  | SUCC_KEYWORD '(' const_expression ')'
-                  | INTEGER_CONSTANT
+const_expression: INTEGER_CONSTANT
                   | CHAR_CONSTANT
                   | STRING_CONSTANT
-                  | IDENTIFIER
+                  | lvalue
                   ;
 
-inside_const_expr: const_expression
-                   | inside_const_expr ',' const_expression
-                   |
+lvalue: IDENTIFIER lvalue_sub
+
+lvalue_sub: lvalue_sub '.' IDENTIFIER
+            | lvalue_sub '[' expression ']'
+            |
+            ;
 
 %%
 
