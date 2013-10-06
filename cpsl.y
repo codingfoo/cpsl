@@ -105,10 +105,13 @@ simple_type: IDENTIFIER
 record_type: RECORD_KEYWORD record_type_statement END_KEYWORD
              ;
 
-record_type_statement: ident_list ':' type ';'
-                       | record_type_statement ident_list ':' type ';'
+ident_list_decl: ident_list ':' type ';';
+
+record_type_statement: ident_list_decl
+                       | record_type_statement ident_list_decl
                        |
                        ;
+
 
 ident_list: IDENTIFIER
             | ident_list ',' IDENTIFIER
@@ -121,8 +124,8 @@ var_decl: VAR_KEYWORD var_statement
           |
           ;
 
-var_statement: ident_list ':' type ';'
-               | var_statement ident_list ':' type ';'
+var_statement: ident_list_decl
+               | var_statement ident_list_decl
                ;
 
 routine: procedure_decl
@@ -133,7 +136,7 @@ routine: procedure_decl
          ;
 
 procedure_decl: PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' FORWARD_KEYWORD ';'
-                | PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' body
+                | PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' body ';'
                 ;
 
 function_decl: FUNCTION_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
@@ -153,8 +156,8 @@ body: constant_decl type_decl var_decl block ;
 
 block: BEGIN_KEYWORD statement_sequence END_KEYWORD ;
 
-statement_sequence: statement ';'
-                    | statement_sequence statement ';'
+statement_sequence: statement
+                    | statement_sequence ';' statement
                     ;
 
 statement: assignment
@@ -189,7 +192,9 @@ whilestatement: WHILE_KEYWORD expression DO_KEYWORD statement_sequence END_KEYWO
 
 repeatstatement: REPEAT_KEYWORD statement_sequence UNTIL_KEYWORD expression;
 
-forstatement: FOR_KEYWORD IDENTIFIER ASSIGNS_OPERATOR expression TO_KEYWORD expression DO_KEYWORD statement_sequence END_KEYWORD ;
+forstatement: FOR_KEYWORD IDENTIFIER ASSIGNS_OPERATOR expression TO_KEYWORD expression DO_KEYWORD statement_sequence END_KEYWORD
+              | FOR_KEYWORD IDENTIFIER ASSIGNS_OPERATOR expression DOWNTO_KEYWORD expression DO_KEYWORD statement_sequence END_KEYWORD
+              ;
 
 
 stopstatement: STOP_KEYWORD;
@@ -207,15 +212,19 @@ writestatement: WRITE_KEYWORD '(' inner_write ')';
 
 inner_write: expression
              | inner_write ',' expression
+             |
+             ;
 
 procedurecall: IDENTIFIER '(' inner_write ')';
 
 nullstatement: ;
 
-lvalue: IDENTIFIER
-        | IDENTIFIER '.' IDENTIFIER
-        | IDENTIFIER '[' expression ']'
-        ;
+lvalue: IDENTIFIER lvalue_sub
+
+lvalue_sub: | lvalue_sub '.' IDENTIFIER
+            | lvalue_sub '[' expression ']'
+            |
+            ;
 
 expression: expression '|' expression
             | expression '&' expression
