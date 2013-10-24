@@ -1,9 +1,11 @@
 %verbose
 %debug
 %error-verbose
+%{
+#include "cpsl.h"
+%}
 
 %{
-#include <string>
 extern "C"
 {
   int yylex(void);
