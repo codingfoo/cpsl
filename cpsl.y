@@ -84,7 +84,10 @@ constant_decl: CONST_KEYWORD const_statement
                |
                ;
 
-const_statement: IDENTIFIER '=' const_expression ';'
+const_statement: IDENTIFIER '=' const_expression ';' {
+                                                        std::shared_ptr<Symbol> new_identifier(new Identifier("foo"));
+                                                        symbol_tables.back()[$1] = new_identifier;
+                                                     }
                  | const_statement IDENTIFIER '=' const_expression ';'
                  ;
 
@@ -277,10 +280,40 @@ int main(int argc, char* argv[]) {
   }
   // yydebug = 1;
 
+  //Setup scope
+  Symbol_Table predefined;
+
+  std::shared_ptr<Symbol> cpsl_int(new Type("integer"));
+  predefined["integer"] = cpsl_int;
+  predefined["INTEGER"] = cpsl_int;
+
+  std::shared_ptr<Symbol> cpsl_char(new Type("char"));
+  predefined["char"] = cpsl_char;
+  predefined["CHAR"] = cpsl_char;
+
+  std::shared_ptr<Symbol> cpsl_boolean(new Type("boolean"));
+  predefined["boolean"] = cpsl_boolean;
+  predefined["BOOLEAN"] = cpsl_boolean;
+
+  std::shared_ptr<Symbol> cpsl_string(new Type("string"));
+  predefined["string"] = cpsl_string;
+  predefined["STRING"] = cpsl_string;
+
+  std::shared_ptr<Symbol> cpsl_true(new Type("true"));
+  predefined["true"] = cpsl_true;
+  predefined["TRUE"] = cpsl_true;
+
+  std::shared_ptr<Symbol> cpsl_false(new Type("false"));
+  predefined["false"] = cpsl_false;
+  predefined["FALSE"] = cpsl_false;
+
+  symbol_tables.push_back(predefined);
 
   do {
     yyparse();
   } while (!feof(yyin));
+
+  std::cout << symbol_tables;
 
   return 0;
 }
