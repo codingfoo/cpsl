@@ -31,6 +31,7 @@ private:
   Symbol_Table();
   Symbol_Table(Symbol_Table const&);   // Leave unimplemented
   void operator=(Symbol_Table const&); // Leave unimplemented
+  void incrementOffset();
 
   int _next_offset;
   std::vector<Symbol_Map> scoped_symbol_table;

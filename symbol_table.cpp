@@ -5,32 +5,32 @@ Symbol_Table::Symbol_Table() :  _next_offset(0)
   Symbol_Map predefined;
 
   std::shared_ptr<Symbol> cpsl_int(new Type("integer", _next_offset));
-  ++_next_offset;
+  incrementOffset();
   predefined["integer"] = cpsl_int;
   predefined["INTEGER"] = cpsl_int;
 
   std::shared_ptr<Symbol> cpsl_char(new Type("char", _next_offset));
-  ++_next_offset;
+  incrementOffset();
   predefined["char"] = cpsl_char;
   predefined["CHAR"] = cpsl_char;
 
   std::shared_ptr<Symbol> cpsl_boolean(new Type("boolean", _next_offset));
-  ++_next_offset;
+  incrementOffset();
   predefined["boolean"] = cpsl_boolean;
   predefined["BOOLEAN"] = cpsl_boolean;
 
   std::shared_ptr<Symbol> cpsl_string(new Type("string", _next_offset));
-  ++_next_offset;
+  incrementOffset();
   predefined["string"] = cpsl_string;
   predefined["STRING"] = cpsl_string;
 
   std::shared_ptr<Symbol> cpsl_true(new Type("true", _next_offset));
-  ++_next_offset;
+  incrementOffset();
   predefined["true"] = cpsl_true;
   predefined["TRUE"] = cpsl_true;
 
   std::shared_ptr<Symbol> cpsl_false(new Type("false", _next_offset));
-  ++_next_offset;
+  incrementOffset();
   predefined["false"] = cpsl_false;
   predefined["FALSE"] = cpsl_false;
 
@@ -44,15 +44,20 @@ Symbol_Table::Symbol_Table() :  _next_offset(0)
 void Symbol_Table::addIdentifier(std::string identifier)
 {
   std::shared_ptr<Identifier> ident(new Identifier(identifier, _next_offset));
-  ++_next_offset;
+  incrementOffset();
   scoped_symbol_table.back()[identifier] = ident;
 }
 
 void Symbol_Table::addType(std::string identifier)
 {
   std::shared_ptr<Type> ident(new Type(identifier, _next_offset));
-  ++_next_offset;
+  incrementOffset();
   scoped_symbol_table.back()[identifier] = ident;
+}
+
+void Symbol_Table::incrementOffset()
+{
+  _next_offset+=sizeof(int);
 }
 
 std::ostream& operator<< (std::ostream &out, Symbol_Map symbol_map)
