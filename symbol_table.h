@@ -26,6 +26,8 @@ public:
 
   void addIdentifier(std::string identifier);
   void addType(std::string identifier);
+  void pushScope();
+  void popScope();
 
 private:
   Symbol_Table();

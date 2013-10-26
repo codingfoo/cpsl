@@ -60,6 +60,18 @@ void Symbol_Table::incrementOffset()
   _next_offset+=sizeof(int);
 }
 
+void Symbol_Table::pushScope()
+{
+  Symbol_Map scope;
+
+  scoped_symbol_table.push_back(scope);
+}
+
+void Symbol_Table::popScope()
+{
+  scoped_symbol_table.pop_back();
+}
+
 std::ostream& operator<< (std::ostream &out, Symbol_Map symbol_map)
 {
   for ( std::map<std::string, std::shared_ptr<Symbol>>::const_iterator iter = symbol_map.begin(); iter != symbol_map.end(); ++iter )
