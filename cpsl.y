@@ -85,18 +85,27 @@ constant_decl: CONST_KEYWORD const_statement
                ;
 
 const_statement: IDENTIFIER '=' const_expression ';' {
-                                                        std::shared_ptr<Symbol> new_identifier(new Identifier("foo"));
-                                                        symbol_tables.back()[$1] = new_identifier;
+                                                        std::shared_ptr<Symbol> new_symbol(new Constant($1));
+                                                        symbol_tables.back()[$1] = new_symbol;
                                                      }
-                 | const_statement IDENTIFIER '=' const_expression ';'
+                 | const_statement IDENTIFIER '=' const_expression ';' {
+                                                        std::shared_ptr<Symbol> new_symbol(new Constant($2));
+                                                        symbol_tables.back()[$2] = new_symbol;
+                                                     }
                  ;
 
 type_decl: TYPE_KEYWORD type_statement
            |
            ;
 
-type_statement: IDENTIFIER '=' type ';'
-                | type_statement IDENTIFIER '=' type ';'
+type_statement: IDENTIFIER '=' type ';' {
+                                        std::shared_ptr<Symbol> new_symbol(new Type($1));
+                                        symbol_tables.back()[$1] = new_symbol;
+                                       }
+                | type_statement IDENTIFIER '=' type ';' {
+                                                        std::shared_ptr<Symbol> new_symbol(new Type($2));
+                                                        symbol_tables.back()[$2] = new_symbol;
+                                                     }
                 ;
 
 type: simple_type
@@ -118,8 +127,14 @@ record_type_statement: ident_list_decl
                        ;
 
 
-ident_list: IDENTIFIER
-            | ident_list ',' IDENTIFIER
+ident_list: IDENTIFIER {
+                                        std::shared_ptr<Symbol> new_symbol(new Identifier($1));
+                                        symbol_tables.back()[$1] = new_symbol;
+                                       }
+            | ident_list ',' IDENTIFIER {
+                                        std::shared_ptr<Symbol> new_symbol(new Identifier($3));
+                                        symbol_tables.back()[$3] = new_symbol;
+                                       }
             ;
 
 array_type: ARRAY_KEYWORD '[' const_expression ':' const_expression ']' OF_KEYWORD type
@@ -308,6 +323,10 @@ int main(int argc, char* argv[]) {
   predefined["FALSE"] = cpsl_false;
 
   symbol_tables.push_back(predefined);
+
+  Symbol_Table global;
+
+  symbol_tables.push_back(global);
 
   do {
     yyparse();
