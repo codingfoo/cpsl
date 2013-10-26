@@ -149,12 +149,9 @@ routine: procedure_decl
          |
          ;
 
-procedure_decl: PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' procedure_decl_postfix
+procedure_decl: PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' FORWARD_KEYWORD ';'
+                | PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' body ';'
                 ;
-
-procedure_decl_postfix: FORWARD_KEYWORD ';'
-                        | body ';'
-                        ;
 
 function_decl: FUNCTION_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
                | FUNCTION_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' body ';'
