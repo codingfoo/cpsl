@@ -4,27 +4,33 @@ Symbol_Table::Symbol_Table() :  _next_offset(0)
 {
   Symbol_Map predefined;
 
-  std::shared_ptr<Symbol> cpsl_int(new Type("integer"));
+  std::shared_ptr<Symbol> cpsl_int(new Type("integer", _next_offset));
+  ++_next_offset;
   predefined["integer"] = cpsl_int;
   predefined["INTEGER"] = cpsl_int;
 
-  std::shared_ptr<Symbol> cpsl_char(new Type("char"));
+  std::shared_ptr<Symbol> cpsl_char(new Type("char", _next_offset));
+  ++_next_offset;
   predefined["char"] = cpsl_char;
   predefined["CHAR"] = cpsl_char;
 
-  std::shared_ptr<Symbol> cpsl_boolean(new Type("boolean"));
+  std::shared_ptr<Symbol> cpsl_boolean(new Type("boolean", _next_offset));
+  ++_next_offset;
   predefined["boolean"] = cpsl_boolean;
   predefined["BOOLEAN"] = cpsl_boolean;
 
-  std::shared_ptr<Symbol> cpsl_string(new Type("string"));
+  std::shared_ptr<Symbol> cpsl_string(new Type("string", _next_offset));
+  ++_next_offset;
   predefined["string"] = cpsl_string;
   predefined["STRING"] = cpsl_string;
 
-  std::shared_ptr<Symbol> cpsl_true(new Type("true"));
+  std::shared_ptr<Symbol> cpsl_true(new Type("true", _next_offset));
+  ++_next_offset;
   predefined["true"] = cpsl_true;
   predefined["TRUE"] = cpsl_true;
 
-  std::shared_ptr<Symbol> cpsl_false(new Type("false"));
+  std::shared_ptr<Symbol> cpsl_false(new Type("false", _next_offset));
+  ++_next_offset;
   predefined["false"] = cpsl_false;
   predefined["FALSE"] = cpsl_false;
 
@@ -37,13 +43,15 @@ Symbol_Table::Symbol_Table() :  _next_offset(0)
 
 void Symbol_Table::addIdentifier(std::string identifier)
 {
-  std::shared_ptr<Identifier> ident(new Identifier(identifier));
+  std::shared_ptr<Identifier> ident(new Identifier(identifier, _next_offset));
+  ++_next_offset;
   scoped_symbol_table.back()[identifier] = ident;
 }
 
 void Symbol_Table::addType(std::string identifier)
 {
-  std::shared_ptr<Type> ident(new Type(identifier));
+  std::shared_ptr<Type> ident(new Type(identifier, _next_offset));
+  ++_next_offset;
   scoped_symbol_table.back()[identifier] = ident;
 }
 

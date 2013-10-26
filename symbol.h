@@ -11,7 +11,7 @@
 
 class Symbol {
 public:
-  explicit Symbol(std::string name) : _name(name) {}
+  explicit Symbol(std::string name, int offset) : _name(name), _offset(offset) {}
   friend std::ostream& operator<< (std::ostream &out, Symbol &symbol);
 private:
   std::string _name;
