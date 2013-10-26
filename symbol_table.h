@@ -1,5 +1,5 @@
-#ifndef __SYMBOL_TABLE_H
-#define __SYMBOL_TABLE_H
+#ifndef SYMBOL_TABLE_H
+#define SYMBOL_TABLE_H
 
 #include <stack>
 #include <map>
@@ -24,7 +24,8 @@ public:
 
   friend std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table);
 
-  void addSymbol(std::string symbol);
+  void addIdentifier(std::string identifier);
+  void addType(std::string identifier);
 
 private:
   Symbol_Table();

@@ -1,11 +1,3 @@
-#include <stack>
-#include <map>
-#include <string>
-#include <memory>
-#include <iostream>
-#include <algorithm> // for copy
-#include <iterator> // for ostream_iterator
-
 #include "symbol_table.h"
 
 Symbol_Table::Symbol_Table() :  _next_offset(0)
@@ -43,10 +35,16 @@ Symbol_Table::Symbol_Table() :  _next_offset(0)
   scoped_symbol_table.push_back(global);
 }
 
-std::ostream& operator<< (std::ostream &out, std::vector<Symbol_Map> symbol_map)
+void Symbol_Table::addIdentifier(std::string identifier)
 {
-  std::copy(symbol_map.begin(), symbol_map.end(), std::ostream_iterator<Symbol_Map>(out, " "));
-  return out;
+  std::shared_ptr<Identifier> ident(new Identifier(identifier));
+  scoped_symbol_table.back()[identifier] = ident;
+}
+
+void Symbol_Table::addType(std::string identifier)
+{
+  std::shared_ptr<Type> ident(new Type(identifier));
+  scoped_symbol_table.back()[identifier] = ident;
 }
 
 std::ostream& operator<< (std::ostream &out, Symbol_Map symbol_map)
@@ -55,6 +53,12 @@ std::ostream& operator<< (std::ostream &out, Symbol_Map symbol_map)
   {
     std::cout << iter->first << '\t' << *iter->second << '\n';
   }
+  return out;
+}
+
+std::ostream& operator<< (std::ostream &out, std::vector<Symbol_Map> symbol_map)
+{
+  std::copy(symbol_map.begin(), symbol_map.end(), std::ostream_iterator<Symbol_Map>(out, " "));
   return out;
 }
 

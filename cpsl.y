@@ -85,12 +85,10 @@ constant_decl: CONST_KEYWORD const_statement
                ;
 
 const_statement: IDENTIFIER '=' const_expression ';' {
-                                                        //std::shared_ptr<Symbol> new_symbol(new Constant($1));
-                                                        //Symbol_Table.getInstance().back()[$1] = new_symbol;
+                                                       Symbol_Table::getInstance().addIdentifier($1);
                                                      }
                  | const_statement IDENTIFIER '=' const_expression ';' {
-                                                        //std::shared_ptr<Symbol> new_symbol(new Constant($2));
-                                                        //Symbol_Table.getInstance().back()[$2] = new_symbol;
+                                                        Symbol_Table::getInstance().addIdentifier($2);
                                                      }
                  ;
 
@@ -99,13 +97,11 @@ type_decl: TYPE_KEYWORD type_statement
            ;
 
 type_statement: IDENTIFIER '=' type ';' {
-                                        //std::shared_ptr<Symbol> new_symbol(new Type($1));
-                                        //Symbol_Table.getInstance().back()[$1] = new_symbol;
-                                       }
+                                          Symbol_Table::getInstance().addType($1);
+                                        }
                 | type_statement IDENTIFIER '=' type ';' {
-                                                        //std::shared_ptr<Symbol> new_symbol(new Type($2));
-                                                        //Symbol_Table.getInstance().back()[$2] = new_symbol;
-                                                     }
+                                                           Symbol_Table::getInstance().addType($2);
+                                                         }
                 ;
 
 type: simple_type
@@ -128,13 +124,11 @@ record_type_statement: ident_list_decl
 
 
 ident_list: IDENTIFIER {
-                                        //std::shared_ptr<Symbol> new_symbol(new Identifier($1));
-                                        //symbol_tables.back()[$1] = new_symbol;
-                                       }
+                         Symbol_Table::getInstance().addIdentifier($1);
+                       }
             | ident_list ',' IDENTIFIER {
-                                        //std::shared_ptr<Symbol> new_symbol(new Identifier($3));
-                                        //symbol_tables.back()[$3] = new_symbol;
-                                       }
+                                          Symbol_Table::getInstance().addIdentifier($3);
+                                        }
             ;
 
 array_type: ARRAY_KEYWORD '[' const_expression ':' const_expression ']' OF_KEYWORD type

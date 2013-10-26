@@ -1,5 +1,5 @@
-#ifndef __SYMBOL_H
-#define __SYMBOL_H
+#ifndef SYMBOL_H
+#define SYMBOL_H
 
 #include <stack>
 #include <map>
@@ -60,4 +60,4 @@ class Constant : public Symbol {
   using Symbol::Symbol;
 };
 
-#endif //__SYMBOL_H
+#endif //SYMBOL_H
