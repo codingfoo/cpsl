@@ -1,15 +1,10 @@
-#include <stack>
-#include <map>
-#include <string>
-#include <memory>
-#include <iostream>
-#include <algorithm> // for copy
-#include <iterator> // for ostream_iterator
+#ifndef __CPSL_H
+#define __CPSL_H
 
 #include "symbol.h"
 #include "symbol_table.h"
 
-
+#endif //__CPSL_H
 
 
 

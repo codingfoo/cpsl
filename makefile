@@ -1,12 +1,12 @@
-CC=g++-4.8
+CC=/usr/local/bin/g++-4.8
 
 all: test
 
 test: build
 	./cpsl test/syntax.cpsl
 
-build: cpsl.tab.c lex.yy.c
-	$(CC) -g -std=c++11 cpsl.tab.c lex.yy.c  -lfl -ll -ly -o cpsl
+build: cpsl.tab.c lex.yy.c symbol.cpp symbol_table.cpp
+	$(CC) -g -std=c++11 cpsl.tab.c lex.yy.c symbol.cpp symbol_table.cpp -lfl -ll -ly -o cpsl
 
 test_lex: build_lex
 	./cpsl_lexer test/lex.cpsl

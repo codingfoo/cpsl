@@ -1,4 +1,13 @@
-#pragma once
+#ifndef __SYMBOL_H
+#define __SYMBOL_H
+
+#include <stack>
+#include <map>
+#include <string>
+#include <memory>
+#include <iostream>
+#include <algorithm> // for copy
+#include <iterator> // for ostream_iterator
 
 class Symbol {
 public:
@@ -12,12 +21,6 @@ private:
 class Type : public Symbol {
   using Symbol::Symbol;
 };
-
-std::ostream& operator<< (std::ostream &out, Symbol &symbol)
-{
-    out << symbol._name;
-    return out;
-}
 
 class Array : public Type {
 
@@ -56,3 +59,5 @@ class Identifier : public Type {
 class Constant : public Symbol {
   using Symbol::Symbol;
 };
+
+#endif //__SYMBOL_H

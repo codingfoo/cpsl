@@ -85,12 +85,12 @@ constant_decl: CONST_KEYWORD const_statement
                ;
 
 const_statement: IDENTIFIER '=' const_expression ';' {
-                                                        std::shared_ptr<Symbol> new_symbol(new Constant($1));
-                                                        symbol_tables.back()[$1] = new_symbol;
+                                                        //std::shared_ptr<Symbol> new_symbol(new Constant($1));
+                                                        //Symbol_Table.getInstance().back()[$1] = new_symbol;
                                                      }
                  | const_statement IDENTIFIER '=' const_expression ';' {
-                                                        std::shared_ptr<Symbol> new_symbol(new Constant($2));
-                                                        symbol_tables.back()[$2] = new_symbol;
+                                                        //std::shared_ptr<Symbol> new_symbol(new Constant($2));
+                                                        //Symbol_Table.getInstance().back()[$2] = new_symbol;
                                                      }
                  ;
 
@@ -99,12 +99,12 @@ type_decl: TYPE_KEYWORD type_statement
            ;
 
 type_statement: IDENTIFIER '=' type ';' {
-                                        std::shared_ptr<Symbol> new_symbol(new Type($1));
-                                        symbol_tables.back()[$1] = new_symbol;
+                                        //std::shared_ptr<Symbol> new_symbol(new Type($1));
+                                        //Symbol_Table.getInstance().back()[$1] = new_symbol;
                                        }
                 | type_statement IDENTIFIER '=' type ';' {
-                                                        std::shared_ptr<Symbol> new_symbol(new Type($2));
-                                                        symbol_tables.back()[$2] = new_symbol;
+                                                        //std::shared_ptr<Symbol> new_symbol(new Type($2));
+                                                        //Symbol_Table.getInstance().back()[$2] = new_symbol;
                                                      }
                 ;
 
@@ -128,12 +128,12 @@ record_type_statement: ident_list_decl
 
 
 ident_list: IDENTIFIER {
-                                        std::shared_ptr<Symbol> new_symbol(new Identifier($1));
-                                        symbol_tables.back()[$1] = new_symbol;
+                                        //std::shared_ptr<Symbol> new_symbol(new Identifier($1));
+                                        //symbol_tables.back()[$1] = new_symbol;
                                        }
             | ident_list ',' IDENTIFIER {
-                                        std::shared_ptr<Symbol> new_symbol(new Identifier($3));
-                                        symbol_tables.back()[$3] = new_symbol;
+                                        //std::shared_ptr<Symbol> new_symbol(new Identifier($3));
+                                        //symbol_tables.back()[$3] = new_symbol;
                                        }
             ;
 
@@ -295,44 +295,11 @@ int main(int argc, char* argv[]) {
   }
   // yydebug = 1;
 
-  //Setup scope
-  Symbol_Table predefined;
-
-  std::shared_ptr<Symbol> cpsl_int(new Type("integer"));
-  predefined["integer"] = cpsl_int;
-  predefined["INTEGER"] = cpsl_int;
-
-  std::shared_ptr<Symbol> cpsl_char(new Type("char"));
-  predefined["char"] = cpsl_char;
-  predefined["CHAR"] = cpsl_char;
-
-  std::shared_ptr<Symbol> cpsl_boolean(new Type("boolean"));
-  predefined["boolean"] = cpsl_boolean;
-  predefined["BOOLEAN"] = cpsl_boolean;
-
-  std::shared_ptr<Symbol> cpsl_string(new Type("string"));
-  predefined["string"] = cpsl_string;
-  predefined["STRING"] = cpsl_string;
-
-  std::shared_ptr<Symbol> cpsl_true(new Type("true"));
-  predefined["true"] = cpsl_true;
-  predefined["TRUE"] = cpsl_true;
-
-  std::shared_ptr<Symbol> cpsl_false(new Type("false"));
-  predefined["false"] = cpsl_false;
-  predefined["FALSE"] = cpsl_false;
-
-  symbol_tables.push_back(predefined);
-
-  Symbol_Table global;
-
-  symbol_tables.push_back(global);
-
   do {
     yyparse();
   } while (!feof(yyin));
 
-  std::cout << symbol_tables;
+  std::cout << Symbol_Table::getInstance();
 
   return 0;
 }

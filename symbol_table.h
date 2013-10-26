@@ -1,24 +1,38 @@
-#pragma once
+#ifndef __SYMBOL_TABLE_H
+#define __SYMBOL_TABLE_H
+
+#include <stack>
+#include <map>
+#include <string>
+#include <memory>
+#include <iostream>
+#include <algorithm> // for copy
+#include <iterator> // for ostream_iterator
 
 #include "symbol.h"
 
-typedef std::map<std::string, std::shared_ptr<Symbol>> Symbol_Table;
+typedef std::map<std::string, std::shared_ptr<Symbol>> Symbol_Map;
 
-std::ostream& operator<< (std::ostream &out, Symbol_Table table)
+class Symbol_Table
 {
-  for ( std::map<std::string, std::shared_ptr<Symbol>>::const_iterator iter = table.begin(); iter != table.end(); ++iter )
+public:
+  static Symbol_Table& getInstance()
   {
-    std::cout << iter->first << '\t' << *iter->second << '\n';
+    static Symbol_Table instance;
+    return instance;
   }
 
-  std::cout << std::endl;
-  return out;
-}
+  friend std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table);
 
-std::vector<Symbol_Table> symbol_tables;
+  void addSymbol(std::string symbol);
 
-std::ostream& operator<< (std::ostream &out, std::vector<Symbol_Table> table)
-{
-  std::copy(table.begin(), table.end(), std::ostream_iterator<Symbol_Table>(out, " "));
-  return out;
-}
+private:
+  Symbol_Table();
+  Symbol_Table(Symbol_Table const&);   // Leave unimplemented
+  void operator=(Symbol_Table const&); // Leave unimplemented
+
+  int _next_offset;
+  std::vector<Symbol_Map> scoped_symbol_table;
+};
+
+#endif //__SYMBOL_TABLE_H
