@@ -17,7 +17,7 @@ std::ostream& operator<< (std::ostream &out, std::vector<Symbol_Map> symbol_map)
 
 std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table)
 {
-  std::cout << symbol_table.scoped_symbol_table;
+  std::cout << symbol_table.scoped_symbol_table << std::endl;
   return out;
 }
 
@@ -91,6 +91,6 @@ void Symbol_Table::pushScope()
 void Symbol_Table::popScope()
 {
   Symbol_Map predefined = scoped_symbol_table.back();
-  std::cout << predefined;
+  std::cout << predefined << std::endl;
   scoped_symbol_table.pop_back();
 }
