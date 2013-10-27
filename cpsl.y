@@ -289,7 +289,32 @@ lvalue_sub: lvalue_sub '.' IDENTIFIER
 %%
 
 int main(int argc, char* argv[]) {
-  ++argv, --argc; // ignore program name
+
+  po::options_description desc("Allowed options");
+  desc.add_options()
+      ("help", "produce help message")
+      ("verbose", "enable output of symbol table")
+      ("debug", "enable debug flags")
+      ("input-file", po::value< std::string >(),  "file to compile")
+  ;
+
+  po::positional_options_description p;
+  p.add("input-file", -1);
+
+  po::variables_map vm;
+  po::store(po::command_line_parser(argc, argv).
+            options(desc).positional(p).run(), vm);
+  po::notify(vm);
+
+  if (vm.count("help")) {
+      std::cout << desc << "\n";
+      return 1;
+  }
+
+  if (vm.count("debug")) {
+    yydebug = 1;
+  }
+
   if ( argc > 0 )
   {
     yyin = fopen( argv[0], "r" );
@@ -298,8 +323,9 @@ int main(int argc, char* argv[]) {
   {
     yyin = stdin;
   }
-  // yydebug = 1;
+
   std::cout << "Identifier" << "  Offset" << std::endl;
+
   do {
     yyparse();
   } while (!feof(yyin));

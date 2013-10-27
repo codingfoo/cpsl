@@ -1,12 +1,27 @@
 CC=/usr/local/bin/g++-4.8
 
+BASE_FLAGS =
+
+# INCLUDE BASE DIRECTORY AND BOOST DIRECTORY FOR HEADERS
+LDFLAGS = -I/usr/local/Cellar/boost/1.54.0/include -I/opt/local/include
+
+# INCLUDE BASE DIRECTORY AND BOOST DIRECTORY FOR LIB FILES
+LLIBFLAGS = -L/usr/local/Cellar/boost/1.54.0/
+
+# SPECIFIY LINK OPTIONS
+LINKFLAGS = -l boost_thread-mt
+
+# FINAL FLAGS -- TO BE USED THROUGHOUT
+FLAGS = $(BASE_FLAGS) $(LLIBFLAGS) $(LDFLAGS) $(LINKFLAGS)
+
+
 all: test
 
 test: build
 	./cpsl test/syntax.cpsl
 
 build: cpsl.tab.c lex.yy.c symbol.cpp symbol_table.cpp
-	$(CC) -g -std=c++11 cpsl.tab.c lex.yy.c symbol.cpp symbol_table.cpp -lfl -ll -ly -o cpsl
+	$(CC) $(FLAGS) -g -std=c++11 cpsl.tab.c lex.yy.c symbol.cpp symbol_table.cpp -lfl -ll -ly -o cpsl
 
 test_lex: build_lex
 	./cpsl_lexer test/lex.cpsl
