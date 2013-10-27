@@ -21,7 +21,7 @@ cpsl.tab.c cpsl.tab.h: cpsl.y
 	bison -d cpsl.y
 
 zip: clean
-	zip cpsl_bowen_masco.zip cpsl.lex cpsl.y makefile
+	zip cpsl_bowen_masco.zip cpsl.lex cpsl.y symbol.h symbol.cpp symbol_table.h symbol_table.cpp makefile
 
 clean:
 	rm -f lex.yy.c
