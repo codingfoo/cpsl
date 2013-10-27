@@ -299,7 +299,7 @@ int main(int argc, char* argv[]) {
     yyin = stdin;
   }
   // yydebug = 1;
-
+  std::cout << "Identifier" << "  Offset" << std::endl;
   do {
     yyparse();
   } while (!feof(yyin));
