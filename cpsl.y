@@ -149,12 +149,26 @@ routine: procedure_decl
          |
          ;
 
-procedure_decl: PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' FORWARD_KEYWORD ';'
-                | PROCEDURE_KEYWORD IDENTIFIER '(' formal_parameters ')' ';' body ';'
+scope_start:
+       {Symbol_Table::getInstance().pushScope()}
+       ;
+
+procedure_ident: PROCEDURE_KEYWORD IDENTIFIER {
+                                                Symbol_Table::getInstance().addIdentifier($2);
+                                              }
+                 ;
+
+procedure_decl: procedure_ident '(' scope_start formal_parameters ')' ';' FORWARD_KEYWORD ';' {Symbol_Table::getInstance().popScope()}
+                | procedure_ident '(' scope_start formal_parameters ')' ';' body ';' {Symbol_Table::getInstance().popScope()}
                 ;
 
-function_decl: FUNCTION_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
-               | FUNCTION_KEYWORD IDENTIFIER '(' formal_parameters ')' ':' type ';' body ';'
+function_ident: FUNCTION_KEYWORD IDENTIFIER {
+                                              Symbol_Table::getInstance().addIdentifier($2);
+                                            }
+                ;
+
+function_decl: function_ident '(' scope_start formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';' {Symbol_Table::getInstance().popScope()}
+               | function_ident '(' scope_start formal_parameters ')' ':' type ';' body ';' {Symbol_Table::getInstance().popScope()}
                ;
 
 formal_parameters: VAR_KEYWORD ident_list ':' type

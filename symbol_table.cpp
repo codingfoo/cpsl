@@ -1,5 +1,26 @@
 #include "symbol_table.h"
 
+std::ostream& operator<< (std::ostream &out, Symbol_Map symbol_map)
+{
+  for ( std::map<std::string, std::shared_ptr<Symbol>>::const_iterator iter = symbol_map.begin(); iter != symbol_map.end(); ++iter )
+  {
+    std::cout << iter->first << '\t' << *iter->second << '\n';
+  }
+  return out;
+}
+
+std::ostream& operator<< (std::ostream &out, std::vector<Symbol_Map> symbol_map)
+{
+  std::copy(symbol_map.begin(), symbol_map.end(), std::ostream_iterator<Symbol_Map>(out, " "));
+  return out;
+}
+
+std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table)
+{
+  std::cout << symbol_table.scoped_symbol_table;
+  return out;
+}
+
 Symbol_Table::Symbol_Table() :  _next_offset(0)
 {
   Symbol_Map predefined;
@@ -69,26 +90,7 @@ void Symbol_Table::pushScope()
 
 void Symbol_Table::popScope()
 {
+  Symbol_Map predefined = scoped_symbol_table.back();
+  std::cout << predefined;
   scoped_symbol_table.pop_back();
-}
-
-std::ostream& operator<< (std::ostream &out, Symbol_Map symbol_map)
-{
-  for ( std::map<std::string, std::shared_ptr<Symbol>>::const_iterator iter = symbol_map.begin(); iter != symbol_map.end(); ++iter )
-  {
-    std::cout << iter->first << '\t' << *iter->second << '\n';
-  }
-  return out;
-}
-
-std::ostream& operator<< (std::ostream &out, std::vector<Symbol_Map> symbol_map)
-{
-  std::copy(symbol_map.begin(), symbol_map.end(), std::ostream_iterator<Symbol_Map>(out, " "));
-  return out;
-}
-
-std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table)
-{
-  std::cout << symbol_table.scoped_symbol_table;
-  return out;
 }
