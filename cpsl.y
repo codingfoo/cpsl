@@ -290,6 +290,19 @@ lvalue_sub: lvalue_sub '.' IDENTIFIER
 
 int main(int argc, char* argv[]) {
   ++argv, --argc; // ignore program name
+  bool verbose(false);
+
+  if ( argc > 0 )
+  {
+    if( strncmp(argv[0], "-v", 2) == 0 )
+    {
+      std::cout << argv[0];
+      ++argv;
+      --argc; // Remove flag
+      verbose = true;
+    }
+  }
+
   if ( argc > 0 )
   {
     yyin = fopen( argv[0], "r" );
@@ -299,12 +312,19 @@ int main(int argc, char* argv[]) {
     yyin = stdin;
   }
   // yydebug = 1;
-  std::cout << "Identifier" << "  Offset" << std::endl;
+  if( verbose )
+  {
+    std::cout << "Identifier" << "  Offset" << std::endl;
+  }
+
   do {
     yyparse();
   } while (!feof(yyin));
 
-  std::cout << Symbol_Table::getInstance();
+  if( verbose )
+  {
+    std::cout << Symbol_Table::getInstance();
+  }
 
   return 0;
 }
