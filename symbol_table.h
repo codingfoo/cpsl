@@ -28,6 +28,7 @@ public:
   void addType(std::string identifier);
   void pushScope();
   void popScope();
+  void setVerbose();
 
 private:
   Symbol_Table();
@@ -37,6 +38,7 @@ private:
 
   int _next_offset;
   std::vector<Symbol_Map> scoped_symbol_table;
+  bool _verbose;
 };
 
 #endif //__SYMBOL_TABLE_H

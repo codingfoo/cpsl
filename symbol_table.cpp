@@ -21,7 +21,7 @@ std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table)
   return out;
 }
 
-Symbol_Table::Symbol_Table() :  _next_offset(0)
+Symbol_Table::Symbol_Table() :  _next_offset(0), _verbose(false)
 {
   Symbol_Map predefined;
 
@@ -81,6 +81,11 @@ void Symbol_Table::incrementOffset()
   _next_offset+=sizeof(int);
 }
 
+void Symbol_Table::setVerbose()
+{
+  _verbose=true;
+}
+
 void Symbol_Table::pushScope()
 {
   Symbol_Map scope;
@@ -91,6 +96,9 @@ void Symbol_Table::pushScope()
 void Symbol_Table::popScope()
 {
   Symbol_Map predefined = scoped_symbol_table.back();
-  std::cout << predefined << std::endl;
+  if(_verbose)
+  {
+    std::cout << predefined << std::endl;
+  }
   scoped_symbol_table.pop_back();
 }
