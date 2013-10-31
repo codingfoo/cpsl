@@ -2,6 +2,7 @@
 %debug
 %error-verbose
 %{
+#include <cstring>
 #include "cpsl.h"
 %}
 
