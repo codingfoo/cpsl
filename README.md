@@ -1,11 +1,10 @@
-cpsl compiler
+CPSL Compiler
 =============
 
-Special Cases
-=============
-error message for newline in string
-error message no double quote in string constant(no escape)
-
+Special Cases For Lexer
+=======================
+TODO: error message for newline in string
+TODO: error message no double quote in string constant(no escape)
 
 "this is "not" a string"
 operators just return the symbol
@@ -18,4 +17,58 @@ extra leading zeros in integer constants
 leading zeros with a 8 or a 9( they would have to be decimal, consider them fail?)
 $ char in string not match comment
 error message for newline(non escaped) in char constant
+
+Notes
+=====
+main
+   opt
+   verbose
+   debug
+   file
+   out file name
+
+   read in string( do yyin / probably has optimizations that I dont know / memmap etc)
+
+   parse / get tree, symbol table
+
+   generate mips code
+
+   write out file
+
+
+parser
+  build up tree
+  compound rules build up stack of rules
+
+
+makefile
+  run mars with file
+
+
+Symbol Table
+============
+symbol table stack
+
+symbol table(map<string>, shared_ptr<symbol>)
+
+symbols
+  type
+    array
+    record
+    simple type
+  function / procedure
+  variable symbols
+  const
+
+– Scope 0 – predefined identifiers in the language
+– Scope 1 – global (main) level
+– Scope 2 – inside procedures and functions
+
+
+symbol name | type | scope | memory location(offset) | value
+
+symbol : metadata( type scope offset value )
+
+how to handle scopes
+
 

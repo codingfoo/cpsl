@@ -4,7 +4,17 @@
 %{
 #include <cstring>
 #include "cpsl.h"
+ASTNode* root;
 %}
+
+%code requires {
+
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#define YY_TYPEDEF_YY_SCANNER_T
+#include "cpsl.h"
+#endif
+
+}
 
 %{
 extern "C"
@@ -22,6 +32,7 @@ void yyerror(const char *s);
   char char_val;
   char *str_ptr;
   char *identifier_ptr;
+  ASTNode* node;
 };
 
 %token ARRAY_KEYWORD
@@ -58,10 +69,15 @@ void yyerror(const char *s);
 %token NOT_EQUAL_OPERATOR
 %token LESS_THAN_OR_EQUAL_OPERATOR
 %token GREATER_THAN_OR_EQUAL_OPERATOR
+
 %token <identifier_ptr> IDENTIFIER
 %token <char_val> CHAR_CONSTANT
 %token <str_ptr> STRING_CONSTANT
 %token <int_val> INTEGER_CONSTANT
+
+/* <type> non-terminal */
+%type <node> const_expression
+%type <node> program
 
 %right NEG
 %left '*' '/' '%'
@@ -71,6 +87,8 @@ void yyerror(const char *s);
 %left '&'
 %left '|'
 
+%start program
+
 %%
 
 program: constant_decl
@@ -78,31 +96,23 @@ program: constant_decl
          var_decl
          routine
          block
-         '.'
+         '.' { $$ = new Program(); root = $$; }
          ;
 
 constant_decl: CONST_KEYWORD const_statement
                |
                ;
 
-const_statement: IDENTIFIER '=' const_expression ';' {
-                                                       Symbol_Table::getInstance().addIdentifier($1);
-                                                     }
-                 | const_statement IDENTIFIER '=' const_expression ';' {
-                                                        Symbol_Table::getInstance().addIdentifier($2);
-                                                     }
+const_statement: IDENTIFIER '=' const_expression ';'
+                 | const_statement IDENTIFIER '=' const_expression ';'
                  ;
 
 type_decl: TYPE_KEYWORD type_statement
            |
            ;
 
-type_statement: IDENTIFIER '=' type ';' {
-                                          Symbol_Table::getInstance().addType($1);
-                                        }
-                | type_statement IDENTIFIER '=' type ';' {
-                                                           Symbol_Table::getInstance().addType($2);
-                                                         }
+type_statement: IDENTIFIER '=' type ';'
+                | type_statement IDENTIFIER '=' type ';'
                 ;
 
 type: simple_type
@@ -124,12 +134,8 @@ record_type_statement: ident_list_decl
                        ;
 
 
-ident_list: IDENTIFIER {
-                         Symbol_Table::getInstance().addIdentifier($1);
-                       }
-            | ident_list ',' IDENTIFIER {
-                                          Symbol_Table::getInstance().addIdentifier($3);
-                                        }
+ident_list: IDENTIFIER
+            | ident_list ',' IDENTIFIER
             ;
 
 array_type: ARRAY_KEYWORD '[' const_expression ':' const_expression ']' OF_KEYWORD type
@@ -150,26 +156,18 @@ routine: procedure_decl
          |
          ;
 
-scope_start:
-       {Symbol_Table::getInstance().pushScope()}
-       ;
-
-procedure_ident: PROCEDURE_KEYWORD IDENTIFIER {
-                                                Symbol_Table::getInstance().addIdentifier($2);
-                                              }
+procedure_ident: PROCEDURE_KEYWORD IDENTIFIER
                  ;
 
-procedure_decl: procedure_ident '(' scope_start formal_parameters ')' ';' FORWARD_KEYWORD ';' {Symbol_Table::getInstance().popScope()}
-                | procedure_ident '(' scope_start formal_parameters ')' ';' body ';' {Symbol_Table::getInstance().popScope()}
+procedure_decl: procedure_ident '(' formal_parameters ')' ';' FORWARD_KEYWORD ';'
+                | procedure_ident '(' formal_parameters ')' ';' body ';'
                 ;
 
-function_ident: FUNCTION_KEYWORD IDENTIFIER {
-                                              Symbol_Table::getInstance().addIdentifier($2);
-                                            }
+function_ident: FUNCTION_KEYWORD IDENTIFIER
                 ;
 
-function_decl: function_ident '(' scope_start formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';' {Symbol_Table::getInstance().popScope()}
-               | function_ident '(' scope_start formal_parameters ')' ':' type ';' body ';' {Symbol_Table::getInstance().popScope()}
+function_decl: function_ident '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
+               | function_ident '(' formal_parameters ')' ':' type ';' body ';'
                ;
 
 formal_parameters: VAR_KEYWORD ident_list ':' type
@@ -233,8 +231,10 @@ readstatement: READ_KEYWORD '(' inner_read ')';
 
 inner_read: lvalue
             | inner_read ',' lvalue
+            ;
 
-writestatement: WRITE_KEYWORD '(' inner_write ')';
+writestatement: WRITE_KEYWORD '(' inner_write ')'
+              ;
 
 inner_write: expression
              | inner_write ',' expression
@@ -274,7 +274,7 @@ inside_expr: expression
              |
              ;
 
-const_expression: INTEGER_CONSTANT
+const_expression: INTEGER_CONSTANT { $$ = new IntegerConstant($1); }
                   | CHAR_CONSTANT
                   | STRING_CONSTANT
                   | lvalue

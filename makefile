@@ -1,12 +1,12 @@
 CC=/usr/local/bin/g++-4.8
 
-all: test
+all: clean test
 
 test: build
-	./cpsl -v test/syntax.cpsl
+	./cpsl -v test/expression.cpsl
 
-build: cpsl.tab.c lex.yy.c symbol.cpp symbol_table.cpp
-	$(CC) -g -std=c++11 cpsl.tab.c lex.yy.c symbol.cpp symbol_table.cpp -lfl -ll -ly -o cpsl
+build: cpsl.tab.c lex.yy.c symbol_table/symbol.cpp symbol_table/symbol_table.cpp
+	$(CC) -g -std=c++11 cpsl.tab.c lex.yy.c symbol_table/symbol.cpp symbol_table/symbol_table.cpp -lfl -ll -ly -o cpsl
 
 test_lex: build_lex
 	./cpsl_lexer test/lex.cpsl
@@ -18,10 +18,10 @@ lex.yy.c: cpsl.lex cpsl.tab.c cpsl.tab.h
 	flex cpsl.lex
 
 cpsl.tab.c cpsl.tab.h: cpsl.y
-	bison -d cpsl.y
+	/usr/local/opt/bison/bin/bison -d cpsl.y
 
 zip: clean
-	zip cpsl_bowen_masco.zip cpsl.lex cpsl.y symbol.h symbol.cpp symbol_table.h symbol_table.cpp makefile
+	zip cpsl_bowen_masco.zip cpsl.lex cpsl.y symbol_table/symbol.h symbol_table/symbol.cpp symbol_table/symbol_table.h symbol_table/symbol_table.cpp makefile
 
 clean:
 	rm -f lex.yy.c
