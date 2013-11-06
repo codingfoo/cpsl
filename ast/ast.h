@@ -13,8 +13,13 @@ class Program : public ASTNode {
 public:
   explicit Program() {}
   virtual void accept(class ASTNodeVisitor &v) { v.visit(*this); };
-private:
-  int _value;
+};
+
+class WriteStatement : public ASTNode {
+public:
+  explicit WriteStatement( IntegerConstant & foo) {}
+  explicit WriteStatement( ASTNode & foo) {}
+  virtual void accept(class ASTNodeVisitor &v) { v.visit(*this); };
 };
 
 class IntegerConstant : public ASTNode {

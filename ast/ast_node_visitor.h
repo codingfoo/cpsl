@@ -5,6 +5,7 @@
 
 class Program;
 class IntegerConstant;
+class WriteStatement;
 
 class ASTNodeVisitor
 {
@@ -12,6 +13,7 @@ public:
   explicit ASTNodeVisitor() {}
   virtual void visit( Program & ast_node ) = 0;
   virtual void visit( IntegerConstant & ast_node ) = 0;
+  virtual void visit( WriteStatement & ast_node ) = 0;
 };
 
 #endif //__AST_NODE_VISITOR
