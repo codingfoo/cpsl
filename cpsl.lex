@@ -1,19 +1,19 @@
-%option warn
-/*%option debug*/
 %option nodefault
 %option noyywrap
+%option warn
+/*%option debug*/
 
 %{
 #include <string>
 #include "cpsl.tab.h"
-%}
 
-%{
-#define YY_DECL extern "C" int yylex()
+#define YY_DECL extern "C" int yylex(void)
+
 void yyerror(const char *s)
 {
       printf("%d: %s\n", yylineno, s);
 }
+
 %}
 
 %x IN_CHAR_CONSTANT
@@ -88,10 +88,10 @@ write|WRITE {return(WRITE_KEYWORD);}
 \\b'          {yylval.char_val = '\b'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
 \\t'          {yylval.char_val = '\t'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
 \\f'          {yylval.char_val = '\f'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
-[[:print:]]' {yylval.char_val = yytext[0]; BEGIN(INITIAL); return(CHAR_CONSTANT);}
-' {yyerror("Invalid character constant: A character constant must not be empty."); BEGIN(INITIAL);}
-\n           {yyerror("Invalid Character constant: Newline is not allowed in a character constant. Constant may be unclosed."); yylineno++; BEGIN(INITIAL);}
-. {yyerror("Invalid Character constant: Invalid character or more than a single represented character."); BEGIN(INITIAL);}
+[[:print:]]'  {yylval.char_val = yytext[0]; BEGIN(INITIAL); return(CHAR_CONSTANT);}
+'             {yyerror("Invalid character constant: A character constant must not be empty."); BEGIN(INITIAL);}
+\n            {yyerror("Invalid Character constant: Newline is not allowed in a character constant. Constant may be unclosed."); yylineno++; BEGIN(INITIAL);}
+.             {yyerror("Invalid Character constant: Invalid character or more than a single represented character."); BEGIN(INITIAL);}
 }
 
 \"[^\"\r\n]*\" {yylval.str_ptr = strdup(yytext); return(STRING_CONSTANT);}

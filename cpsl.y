@@ -1,9 +1,12 @@
 %verbose
 %debug
 %error-verbose
+
 %{
 #include <cstring>
-#include "cpsl.h"
+#include "symbol_table/symbol.h"
+#include "symbol_table/symbol_table.h"
+#include "ast/ast.h"
 ASTNode* root;
 %}
 
@@ -11,19 +14,17 @@ ASTNode* root;
 
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
-#include "cpsl.h"
+#include "symbol_table/symbol.h"
+#include "symbol_table/symbol_table.h"
+#include "ast/ast.h"
 #endif
 
 }
 
 %{
-extern "C"
-{
-  int yylex(void);
-}
+extern "C" int yylex(void);
 extern "C" int yyparse();
 extern "C" FILE *yyin;
-
 void yyerror(const char *s);
 %}
 
@@ -77,7 +78,10 @@ void yyerror(const char *s);
 
 /* <type> non-terminal */
 %type <node> const_expression
+%type <node> expression
 %type <node> program
+%type <node> inner_write
+%type <node> writestatement
 
 %right NEG
 %left '*' '/' '%'
@@ -233,10 +237,10 @@ inner_read: lvalue
             | inner_read ',' lvalue
             ;
 
-writestatement: WRITE_KEYWORD '(' inner_write ')'
+writestatement: WRITE_KEYWORD '(' inner_write ')' { $$ = new WriteStatement(*$3); }
               ;
 
-inner_write: expression
+inner_write: expression { $$ = $1; }
              | inner_write ',' expression
              |
              ;
@@ -266,7 +270,8 @@ expression: expression '|' expression
             | ORD_KEYWORD '(' expression ')'
             | PRED_KEYWORD '(' expression ')'
             | SUCC_KEYWORD '(' expression ')'
-            | const_expression
+            | const_expression { $$ = $1; }
+            | lvalue
             ;
 
 inside_expr: expression
@@ -275,9 +280,8 @@ inside_expr: expression
              ;
 
 const_expression: INTEGER_CONSTANT { $$ = new IntegerConstant($1); }
-                  | CHAR_CONSTANT
-                  | STRING_CONSTANT
-                  | lvalue
+                  | CHAR_CONSTANT {  }
+                  | STRING_CONSTANT { }
                   ;
 
 lvalue: IDENTIFIER lvalue_sub
@@ -325,6 +329,7 @@ int main(int argc, char* argv[]) {
   if( verbose )
   {
     std::cout << Symbol_Table::getInstance();
+    //std::cout << *root;
   }
 
   return 0;
