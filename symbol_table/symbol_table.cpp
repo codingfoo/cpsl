@@ -62,18 +62,18 @@ Symbol_Table::Symbol_Table() :  _next_offset(0), _verbose(false)
   scoped_symbol_table.push_back(global);
 }
 
-void Symbol_Table::addIdentifier(std::string identifier)
+void Symbol_Table::addId(std::string id)
 {
-  std::shared_ptr<Identifier> ident(new Identifier(identifier, _next_offset));
+  std::shared_ptr<Id> ident(new Id(id, _next_offset));
   incrementOffset();
-  scoped_symbol_table.back()[identifier] = ident;
+  scoped_symbol_table.back()[id] = ident;
 }
 
-void Symbol_Table::addType(std::string identifier)
+void Symbol_Table::addType(std::string id)
 {
-  std::shared_ptr<Type> ident(new Type(identifier, _next_offset));
+  std::shared_ptr<Type> ident(new Type(id, _next_offset));
   incrementOffset();
-  scoped_symbol_table.back()[identifier] = ident;
+  scoped_symbol_table.back()[id] = ident;
 }
 
 void Symbol_Table::incrementOffset()

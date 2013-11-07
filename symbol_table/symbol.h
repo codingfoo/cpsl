@@ -52,7 +52,7 @@ class Function : public Type {
 class Procedure : public Type {
 };
 
-class Identifier : public Type {
+class Id : public Type {
   using Type::Type;
 };
 
