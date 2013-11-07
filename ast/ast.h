@@ -1,6 +1,12 @@
 #ifndef __NODE_H
 #define __NODE_H
-
+#include <stack>
+#include <map>
+#include <string>
+#include <memory>
+#include <iostream>
+#include <algorithm> // for copy
+#include <iterator> // for ostream_iterator
 #include "ast_node_visitor.h"
 
 class ASTNode {
@@ -26,6 +32,8 @@ class IntegerConstant : public ASTNode {
 public:
   explicit IntegerConstant(int value) : _value(value) {}
   virtual void accept(class ASTNodeVisitor &v) { v.visit(*this); };
+  friend std::ostream& operator<< (std::ostream &out, const IntegerConstant &constant);
+  int getValue() { return _value; }
 private:
   int _value;
 };

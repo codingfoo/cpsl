@@ -7,19 +7,18 @@
 #include "symbol_table/symbol.h"
 #include "symbol_table/symbol_table.h"
 #include "ast/ast.h"
-ASTNode* root;
 %}
 
 %code requires {
 
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
-#include "symbol_table/symbol.h"
-#include "symbol_table/symbol_table.h"
 #include "ast/ast.h"
 #endif
+#define YYSTYPE ASTNode*
 
 }
+
 
 %{
 extern "C" int yylex(void);
@@ -28,13 +27,6 @@ extern "C" FILE *yyin;
 void yyerror(const char *s);
 %}
 
-%union {
-  int int_val;
-  char char_val;
-  char *str_ptr;
-  char *identifier_ptr;
-  ASTNode* node;
-};
 
 %token ARRAY_KEYWORD
 %token BEGIN_KEYWORD
@@ -71,17 +63,19 @@ void yyerror(const char *s);
 %token LESS_THAN_OR_EQUAL_OPERATOR
 %token GREATER_THAN_OR_EQUAL_OPERATOR
 
-%token <identifier_ptr> IDENTIFIER
-%token <char_val> CHAR_CONSTANT
-%token <str_ptr> STRING_CONSTANT
-%token <int_val> INTEGER_CONSTANT
+%token IDENTIFIER
+%token CHAR_CONSTANT
+%token STRING_CONSTANT
+%token INTEGER_CONSTANT
 
 /* <type> non-terminal */
+/*
 %type <node> const_expression
 %type <node> expression
 %type <node> program
 %type <node> inner_write
 %type <node> writestatement
+*/
 
 %right NEG
 %left '*' '/' '%'
@@ -100,7 +94,7 @@ program: constant_decl
          var_decl
          routine
          block
-         '.' { $$ = new Program(); root = $$; }
+         '.' { /*$$ = new Program();*/ }
          ;
 
 constant_decl: CONST_KEYWORD const_statement
@@ -237,10 +231,10 @@ inner_read: lvalue
             | inner_read ',' lvalue
             ;
 
-writestatement: WRITE_KEYWORD '(' inner_write ')' { $$ = new WriteStatement(*$3); }
+writestatement: WRITE_KEYWORD '(' inner_write ')' { /*$$ = new WriteStatement(*$3);*/ }
               ;
 
-inner_write: expression { $$ = $1; }
+inner_write: expression { /*$$ = $1;*/ }
              | inner_write ',' expression
              |
              ;
@@ -270,7 +264,7 @@ expression: expression '|' expression
             | ORD_KEYWORD '(' expression ')'
             | PRED_KEYWORD '(' expression ')'
             | SUCC_KEYWORD '(' expression ')'
-            | const_expression { $$ = $1; }
+            | const_expression { /*$$ = $1;*/ }
             | lvalue
             ;
 
@@ -279,7 +273,7 @@ inside_expr: expression
              |
              ;
 
-const_expression: INTEGER_CONSTANT { $$ = new IntegerConstant($1); }
+const_expression: INTEGER_CONSTANT { std::cout << dynamic_cast<IntegerConstant *>($1)->getValue() << std::endl; }
                   | CHAR_CONSTANT {  }
                   | STRING_CONSTANT { }
                   ;
@@ -322,14 +316,11 @@ int main(int argc, char* argv[]) {
     std::cout << "Identifier" << "  Offset" << std::endl;
   }
 
-  do {
-    yyparse();
-  } while (!feof(yyin));
+  yyparse();
 
   if( verbose )
   {
     std::cout << Symbol_Table::getInstance();
-    //std::cout << *root;
   }
 
   return 0;
