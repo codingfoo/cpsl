@@ -6,7 +6,17 @@
 
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
-#include "ast/ast.h"
+#include "ast/ast_node.h"
+#include "ast/statement.h"
+#include "ast/statement_list.h"
+#include "ast/program.h"
+#include "ast/constant.h"
+#include "ast/integer_constant.h"
+#include "ast/write_statement.h"
+#include "ast/stop_statement.h"
+#include "ast/char_constant.h"
+#include "ast/string_constant.h"
+#include "ast/identifier.h"
 #include "ast/emit_ast_node_visitor.h"
 #endif
 
@@ -27,7 +37,17 @@ void yyerror(const char *s);
 #include "vector"
 #include "symbol_table/symbol.h"
 #include "symbol_table/symbol_table.h"
-#include "ast/ast.h"
+#include "ast/ast_node.h"
+#include "ast/statement.h"
+#include "ast/statement_list.h"
+#include "ast/program.h"
+#include "ast/constant.h"
+#include "ast/integer_constant.h"
+#include "ast/write_statement.h"
+#include "ast/stop_statement.h"
+#include "ast/char_constant.h"
+#include "ast/string_constant.h"
+#include "ast/identifier.h"
 #include "ast/emit_ast_node_visitor.h"
 Program* root;
 %}

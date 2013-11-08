@@ -1,8 +1,6 @@
 #ifndef __AST_NODE_VISITOR
 #define __AST_NODE_VISITOR
 
-#include "ast.h"
-
 class Program;
 class IntegerConstant;
 class WriteStatement;
