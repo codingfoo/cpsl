@@ -115,7 +115,7 @@ program: constant_decl
          var_decl
          routine
          block
-         '.' { $$ = new Program($5); root = $$; }
+         '.' { $$ = new Program(*$5); root = $$; }
          ;
 
 constant_decl: CONST_KEYWORD const_statement

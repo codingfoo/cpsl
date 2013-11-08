@@ -6,12 +6,19 @@ EmitASTNodeVisitor::EmitASTNodeVisitor() {}
 void EmitASTNodeVisitor::visit( Program & ast_node )
 {
   std::cout << "ast_node" << std::endl;
-  //ast_node.getStatementList().accept(this);
+  ast_node.getStatementList().accept(*this);
 }
 
-void EmitASTNodeVisitor::visit( StatementList & ast_node ) {}
+void EmitASTNodeVisitor::visit( StatementList & ast_node )
+{
+  std::cout << "statementList"<< std::endl;
+}
+
 void EmitASTNodeVisitor::visit( IntegerConstant & ast_node ) {}
-void EmitASTNodeVisitor::visit( WriteStatement & ast_node ) {}
+void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
+{
+  std::cout << "WriteStatement"<< std::endl;
+}
 void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( StringConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( Identifier & ast_node ) {}

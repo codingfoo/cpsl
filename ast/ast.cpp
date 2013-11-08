@@ -24,6 +24,11 @@ void Identifier::accept(ASTNodeVisitor &v) { v.visit(*this); }
 
 //Program::Program(StatementList* &statements) {}
 void Program::accept(ASTNodeVisitor &v) { v.visit(*this); }
+StatementList& Program::getStatementList()
+{
+  return _sl;
+}
+
 
 Constant::Constant() {}
 

@@ -35,10 +35,11 @@ private:
 
 class Program : public ASTNode {
 public:
-  explicit Program(StatementList* &statements) : _sl(statements) {}
+  explicit Program(StatementList& statements) : _sl(statements) {}
   void accept(ASTNodeVisitor &v);
+  StatementList& getStatementList();
 private:
-  StatementList* _sl;
+  StatementList& _sl;
 };
 
 class Constant : public ASTNode {
