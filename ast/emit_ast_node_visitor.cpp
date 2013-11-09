@@ -1,6 +1,10 @@
+#include <string>
+
 #include "program.h"
 #include "write_statement.h"
 #include "expression_type.h"
+#include "integer_constant.h"
+#include "add_expression.h"
 #include "ast_node_visitor.h"
 #include "emit_ast_node_visitor.h"
 
@@ -62,8 +66,6 @@ void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
 {
   /*
   print_int    1 $a0 = integer to be printed
-  print_float  2 $f12 = float to be printed
-  print_double 3 $f12 = double to be printed
   print_string 4 $a0 = address of string in memory
   */
   for (auto it = ast_node.getExpressionList().getExpressionList().begin(); it != ast_node.getExpressionList().getExpressionList().end(); it++) {
@@ -72,7 +74,7 @@ void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
     if( (*it)->getType() == INTEGER_EXPRESSION )
     {
       emitCode("li  $v0, 1"); // load appropriate system call code into register $v0
-      emitCode("move  $a0, $t2"); // set up register corresponding to sys call
+      emitCode("move  $a0, $t0"); // set up register corresponding to sys call
       emitCode("syscall"); // make syscall
     }
 
@@ -80,22 +82,36 @@ void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
     {
       emitCode("li  $v0, 4"); // load appropriate system call code into register $v0
       // TODO: lookup label in symbol table
-      emitCode("move  $a0, $t2"); // set up register corresponding to sys call
+      emitCode("move  $a0, $t0"); // set up register corresponding to sys call
       emitCode("syscall"); // make syscall
     }
   }
 }
 
-void EmitASTNodeVisitor::visit( StopStatement & ast_node )
-{
-  std::cout << "Stop Statement" << std::endl;
-}
+void EmitASTNodeVisitor::visit( StopStatement & ast_node ) {}
 
 void EmitASTNodeVisitor::visit( ExpressionList & ast_node ) {}
 void EmitASTNodeVisitor::visit( Expression & ast_node ) {}
-void EmitASTNodeVisitor::visit( AddExpression & ast_node ) {}
+void EmitASTNodeVisitor::visit( AddExpression & ast_node )
+{
+  ast_node.getLeft().accept(*this);
 
-void EmitASTNodeVisitor::visit( IntegerConstant & ast_node ) {}
+  emitCode("add  $t1,$t0,$zero");
+
+  ast_node.getRight().accept(*this);
+
+  emitCode("add  $t2,$t0,$zero");
+
+  emitCode("add  $t0,$t1,$t2");
+}
+
+void EmitASTNodeVisitor::visit( IntegerConstant & ast_node )
+{
+  if(ast_node.getType() == INTEGER_EXPRESSION)
+  {
+    emitCode("li  $t0, " + std::to_string(ast_node.getValue()) );
+  }
+}
 void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( StringConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( Identifier & ast_node ) {}

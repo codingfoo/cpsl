@@ -8,6 +8,11 @@ Expression_Type IntegerConstant::getType()
   return INTEGER_EXPRESSION;
 }
 
+int IntegerConstant::getValue()
+{
+  return _value;
+}
+
 std::ostream& operator<< (std::ostream &out, const IntegerConstant &obj)
 {
     out << obj._value;

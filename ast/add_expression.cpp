@@ -11,3 +11,13 @@ Expression_Type AddExpression::getType()
   }
   return INVALID_EXPRESSION;
 }
+
+Expression& AddExpression::getLeft()
+{
+  return _left;
+}
+
+Expression& AddExpression::getRight()
+{
+  return _right;
+}
