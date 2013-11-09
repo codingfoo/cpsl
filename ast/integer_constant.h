@@ -8,6 +8,7 @@ class IntegerConstant : public Constant {
 public:
   explicit IntegerConstant(int value) : _value(value) {}
   void accept(ASTNodeVisitor &v);
+  Expression_Type getType();
   friend std::ostream& operator<< (std::ostream &out, const IntegerConstant &obj);
 private:
   int _value;

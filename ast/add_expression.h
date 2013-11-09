@@ -7,6 +7,10 @@ class AddExpression : public Expression {
 public:
   explicit AddExpression(Expression& left, Expression& right);
   void accept(ASTNodeVisitor &v);
+  Expression_Type getType();
+private:
+  Expression& _left;
+  Expression& _right;
 };
 
 #endif // __ADD_EXPRESSION_H

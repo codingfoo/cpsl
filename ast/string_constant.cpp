@@ -3,6 +3,11 @@
 
 void StringConstant::accept(ASTNodeVisitor &v) { v.visit(*this); }
 
+Expression_Type StringConstant::getType()
+{
+  return STRING_EXPRESSION;
+}
+
 std::ostream& operator<< (std::ostream &out, const StringConstant &obj)
 {
     out << obj._value;

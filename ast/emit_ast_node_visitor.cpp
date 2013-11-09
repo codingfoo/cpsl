@@ -1,4 +1,6 @@
 #include "program.h"
+#include "write_statement.h"
+#include "expression_type.h"
 #include "ast_node_visitor.h"
 #include "emit_ast_node_visitor.h"
 
@@ -58,18 +60,30 @@ void EmitASTNodeVisitor::visit( Statement & ast_node )
 
 void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
 {
-  std::cout << "Write Statement" << std::endl;
-
   /*
   print_int    1 $a0 = integer to be printed
   print_float  2 $f12 = float to be printed
   print_double 3 $f12 = double to be printed
   print_string 4 $a0 = address of string in memory
   */
+  for (auto it = ast_node.getExpressionList().getExpressionList().begin(); it != ast_node.getExpressionList().getExpressionList().end(); it++) {
+    (*it)->accept(*this);
 
-  //emitCode("li  $v0, 1"); // load appropriate system call code into register $v0
-  //emitCode("move  $a0, $t2"); // set up register corresponding to sys call
-  //emitCode("syscall"); // make syscall
+    if( (*it)->getType() == INTEGER_EXPRESSION )
+    {
+      emitCode("li  $v0, 1"); // load appropriate system call code into register $v0
+      emitCode("move  $a0, $t2"); // set up register corresponding to sys call
+      emitCode("syscall"); // make syscall
+    }
+
+    if( (*it)->getType() == STRING_EXPRESSION )
+    {
+      emitCode("li  $v0, 4"); // load appropriate system call code into register $v0
+      // TODO: lookup label in symbol table
+      emitCode("move  $a0, $t2"); // set up register corresponding to sys call
+      emitCode("syscall"); // make syscall
+    }
+  }
 }
 
 void EmitASTNodeVisitor::visit( StopStatement & ast_node )

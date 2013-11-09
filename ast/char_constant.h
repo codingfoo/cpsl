@@ -9,6 +9,7 @@ class CharConstant : public Constant {
 public:
   explicit CharConstant(char value) : _value(value) {}
   void accept(ASTNodeVisitor &v);
+  Expression_Type getType();
   friend std::ostream& operator<< (std::ostream &out, const CharConstant &obj);
 private:
   char _value;
