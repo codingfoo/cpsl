@@ -1,15 +1,41 @@
-#include <iostream>
-
 #include "program.h"
 #include "ast_node_visitor.h"
 #include "emit_ast_node_visitor.h"
 
-EmitASTNodeVisitor::EmitASTNodeVisitor() {}
+EmitASTNodeVisitor::EmitASTNodeVisitor()
+{
+  asmfile.open("./output.asm", std::ios::trunc);
+}
+
+EmitASTNodeVisitor::~EmitASTNodeVisitor()
+{
+  asmfile.close();
+}
+
+void EmitASTNodeVisitor::emitHeader(std::string header)
+{
+  asmfile << '\t' << header << std::endl;
+}
+
+void EmitASTNodeVisitor::emitLabel(std::string label)
+{
+  asmfile << label << std::endl;
+}
+
+void EmitASTNodeVisitor::emitCode(std::string code)
+{
+  asmfile << '\t' << code << std::endl;
+}
 
 void EmitASTNodeVisitor::visit( Program & ast_node )
 {
-  std::cout << "Program" << std::endl;
+  emitHeader(".globl main");
+  emitLabel("main:");
+
   ast_node.getStatementList().accept(*this);
+
+  emitCode("li $v0, 10");
+  emitCode("syscall");
 }
 
 void EmitASTNodeVisitor::visit( StatementList & ast_node )
