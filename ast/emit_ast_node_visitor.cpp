@@ -79,6 +79,7 @@ void EmitASTNodeVisitor::visit( StopStatement & ast_node )
 
 void EmitASTNodeVisitor::visit( ExpressionList & ast_node ) {}
 void EmitASTNodeVisitor::visit( Expression & ast_node ) {}
+void EmitASTNodeVisitor::visit( AddExpression & ast_node ) {}
 
 void EmitASTNodeVisitor::visit( IntegerConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}

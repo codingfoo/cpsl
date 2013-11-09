@@ -16,6 +16,7 @@
 #include "ast/stop_statement.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
+#include "ast/add_expression.h"
 #include "ast/constant.h"
 #include "ast/integer_constant.h"
 #include "ast/char_constant.h"
@@ -50,6 +51,7 @@ void yyerror(const char *s);
 #include "ast/stop_statement.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
+#include "ast/add_expression.h"
 #include "ast/constant.h"
 #include "ast/integer_constant.h"
 #include "ast/char_constant.h"
@@ -126,6 +128,7 @@ Program* root;
 %type <write_statement> writestatement
 %type <expression_list> inner_write
 %type <expression> expression
+%type <expression> const_expression
 
 %right NEG
 %left '*' '/' '%'
@@ -302,7 +305,7 @@ expression: expression '|' expression
             | expression GREATER_THAN_OR_EQUAL_OPERATOR expression
             | expression '<' expression
             | expression '>' expression
-            | expression '+' expression
+            | expression '+' expression { $$ = new AddExpression(*$1, *$3); }
             | expression '-' expression
             | expression '*' expression
             | expression '/' expression
@@ -315,7 +318,7 @@ expression: expression '|' expression
             | ORD_KEYWORD '(' expression ')'
             | PRED_KEYWORD '(' expression ')'
             | SUCC_KEYWORD '(' expression ')'
-            | const_expression
+            | const_expression { $$ = $1; }
             | lvalue
             ;
 
@@ -324,7 +327,7 @@ inside_expr: expression
              |
              ;
 
-const_expression: INTEGER_CONSTANT
+const_expression: INTEGER_CONSTANT { $$ = $1; }
                   | CHAR_CONSTANT
                   | STRING_CONSTANT
                   ;

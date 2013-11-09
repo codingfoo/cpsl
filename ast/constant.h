@@ -1,9 +1,9 @@
 #ifndef __CONSTANT_H
 #define __CONSTANT_H
 
-#include "ast_node.h"
+#include "expression.h"
 
-class Constant : public ASTNode {
+class Constant : public Expression {
 public:
   explicit Constant();
 };
