@@ -7,8 +7,12 @@ HEADERS=$(wildcard **/*.h)
 CFLAGS=-Wall -g -std=c++11
 LDFLAGS=-lfl -ll -ly
 EXECUTABLE=cpsl
+MARS=../Mars4_4.jar
 
 all: clean test
+
+run: test
+	java -jar $(MARS) output.asm
 
 test: build
 	./cpsl -v test/expression.cpsl
