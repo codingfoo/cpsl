@@ -4,15 +4,15 @@
 #include <iostream>
 
 #include "statement.h"
-#include "write_statement.h"
-#include "integer_constant.h"
+#include "expression_list.h"
 
 class WriteStatement : public Statement {
 public:
-  explicit WriteStatement();
-  explicit WriteStatement( IntegerConstant &foo );
-  explicit WriteStatement( ASTNode &foo );
+  explicit WriteStatement(ExpressionList& expressions) : _el(expressions) {}
   void accept(ASTNodeVisitor &v);
+  ExpressionList& getExpressionList();
+private:
+  ExpressionList& _el;
 };
 
 #endif // __WRITE_STATEMENT_H

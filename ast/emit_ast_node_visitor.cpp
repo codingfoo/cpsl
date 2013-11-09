@@ -67,15 +67,19 @@ void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
   print_string 4 $a0 = address of string in memory
   */
 
-  emitCode("li  $v0, 1"); // load appropriate system call code into register $v0
-  emitCode("move  $a0, $t2"); // set up register corresponding to sys call
-  emitCode("syscall"); // make syscall
+  //emitCode("li  $v0, 1"); // load appropriate system call code into register $v0
+  //emitCode("move  $a0, $t2"); // set up register corresponding to sys call
+  //emitCode("syscall"); // make syscall
 }
 
 void EmitASTNodeVisitor::visit( StopStatement & ast_node )
 {
   std::cout << "Stop Statement" << std::endl;
 }
+
+void EmitASTNodeVisitor::visit( ExpressionList & ast_node ) {}
+void EmitASTNodeVisitor::visit( Expression & ast_node ) {}
+
 void EmitASTNodeVisitor::visit( IntegerConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( StringConstant & ast_node ) {}

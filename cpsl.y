@@ -6,18 +6,23 @@
 
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
+#include "symbol_table/symbol.h"
+#include "symbol_table/symbol_table.h"
 #include "ast/ast_node.h"
-#include "ast/statement.h"
-#include "ast/statement_list.h"
 #include "ast/program.h"
-#include "ast/constant.h"
-#include "ast/integer_constant.h"
+#include "ast/statement_list.h"
+#include "ast/statement.h"
 #include "ast/write_statement.h"
 #include "ast/stop_statement.h"
+#include "ast/expression_list.h"
+#include "ast/expression.h"
+#include "ast/constant.h"
+#include "ast/integer_constant.h"
 #include "ast/char_constant.h"
 #include "ast/string_constant.h"
 #include "ast/identifier.h"
 #include "ast/emit_ast_node_visitor.h"
+
 #endif
 
 }
@@ -38,32 +43,37 @@ void yyerror(const char *s);
 #include "symbol_table/symbol.h"
 #include "symbol_table/symbol_table.h"
 #include "ast/ast_node.h"
-#include "ast/statement.h"
-#include "ast/statement_list.h"
 #include "ast/program.h"
-#include "ast/constant.h"
-#include "ast/integer_constant.h"
+#include "ast/statement_list.h"
+#include "ast/statement.h"
 #include "ast/write_statement.h"
 #include "ast/stop_statement.h"
+#include "ast/expression_list.h"
+#include "ast/expression.h"
+#include "ast/constant.h"
+#include "ast/integer_constant.h"
 #include "ast/char_constant.h"
 #include "ast/string_constant.h"
 #include "ast/identifier.h"
 #include "ast/emit_ast_node_visitor.h"
+
 Program* root;
 %}
 
 
 %union {
+  Program* program;
+  StatementList* statement_list;
+  Statement* statement;
+  WriteStatement* write_statement;
+  StopStatement* stop_statment;
+  ExpressionList* expression_list;
+  Expression* expression;
   Constant* constant;
   IntegerConstant* integer_constant;
   CharConstant* char_constant;
   StringConstant* string_constant;
   Identifier* identifier;
-  WriteStatement* write_statement;
-  StopStatement* stop_statment;
-  Program* program;
-  StatementList* statement_list;
-  Statement* statement;
 }
 
 
@@ -108,17 +118,14 @@ Program* root;
 %token <integer_constant> INTEGER_CONSTANT
 
 /* <type> non-terminal */
-/*
-%type <constant> const_expression
-%type <constant> expression
-%type <constant> inner_write
-%type <write_statement> writestatement
-%type <stop_statement> stopstatement
-*/
-%type <statement> statement
+%type <program> program
 %type <statement_list> statement_sequence
 %type <statement_list> block
-%type <program> program
+%type <statement> statement
+%type <stop_statement> stopstatement
+%type <write_statement> writestatement
+%type <expression_list> inner_write
+%type <expression> expression
 
 %right NEG
 %left '*' '/' '%'
@@ -234,7 +241,7 @@ statement: assignment
            | stopstatement { $$ = new StopStatement(); }
            | returnstatement
            | readstatement
-           | writestatement { $$ = new WriteStatement(); }
+           | writestatement { $$ = $1; }
            | procedurecall
            | nullstatement
            ;
@@ -275,11 +282,11 @@ inner_read: lvalue
             | inner_read ',' lvalue
             ;
 
-writestatement: WRITE_KEYWORD '(' inner_write ')'
+writestatement: WRITE_KEYWORD '(' inner_write ')' { $$ = new WriteStatement(*$3); }
               ;
 
-inner_write: expression
-             | inner_write ',' expression
+inner_write: expression { $$ = new ExpressionList(); $$->push_back($1); }
+             | inner_write ',' expression { $$->push_back($3); }
              |
              ;
 
