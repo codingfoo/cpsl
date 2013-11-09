@@ -1,19 +1,19 @@
-%option warn
-/*%option debug*/
 %option nodefault
 %option noyywrap
+%option warn
+/*%option debug*/
 
 %{
 #include <string>
 #include "cpsl.tab.h"
-%}
 
-%{
-#define YY_DECL extern "C" int yylex()
+#define YY_DECL extern "C" int yylex(void)
+
 void yyerror(const char *s)
 {
       printf("%d: %s\n", yylineno, s);
 }
+
 %}
 
 %x IN_CHAR_CONSTANT
@@ -51,7 +51,7 @@ var|VAR {return(VAR_KEYWORD);}
 while|WHILE {return(WHILE_KEYWORD);}
 write|WRITE {return(WRITE_KEYWORD);}
 
-[[:alpha:]][[:alnum:]_]* {yylval.identifier_ptr = strdup(yytext); return(IDENTIFIER);}
+[[:alpha:]][[:alnum:]_]* {yylval.identifier = new Identifier(yytext); return(IDENTIFIER);}
 
 "+"  {return(yytext[0]);}
 "-"  {return(yytext[0]);}
@@ -77,24 +77,24 @@ write|WRITE {return(WRITE_KEYWORD);}
 "<>" {return(NOT_EQUAL_OPERATOR);}
 ":=" {return(ASSIGNS_OPERATOR);}
 
-0x[0-9a-fA-F]* {yylval.int_val = std::stoi(yytext, 0, 0); return(INTEGER_CONSTANT);}
-0[0-7]*        {yylval.int_val = std::stoi(yytext, 0, 0); return(INTEGER_CONSTANT);}
-[0-9][0-9]*    {yylval.int_val = std::stoi(yytext, 0, 0); return(INTEGER_CONSTANT);}
+0x[0-9a-fA-F]* {yylval.integer_constant = new IntegerConstant(std::stoi(yytext, 0, 0)); return(INTEGER_CONSTANT);}
+0[0-7]*        {yylval.integer_constant = new IntegerConstant(std::stoi(yytext, 0, 0)); return(INTEGER_CONSTANT);}
+[0-9][0-9]*    {yylval.integer_constant = new IntegerConstant(std::stoi(yytext, 0, 0)); return(INTEGER_CONSTANT);}
 
 '           { BEGIN(IN_CHAR_CONSTANT); }
 <IN_CHAR_CONSTANT>{
-\\n'          {yylval.char_val = '\n'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
-\\r'          {yylval.char_val = '\r'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
-\\b'          {yylval.char_val = '\b'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
-\\t'          {yylval.char_val = '\t'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
-\\f'          {yylval.char_val = '\f'; BEGIN(INITIAL); return(CHAR_CONSTANT);}
-[[:print:]]' {yylval.char_val = yytext[0]; BEGIN(INITIAL); return(CHAR_CONSTANT);}
-' {yyerror("Invalid character constant: A character constant must not be empty."); BEGIN(INITIAL);}
-\n           {yyerror("Invalid Character constant: Newline is not allowed in a character constant. Constant may be unclosed."); yylineno++; BEGIN(INITIAL);}
-. {yyerror("Invalid Character constant: Invalid character or more than a single represented character."); BEGIN(INITIAL);}
+\\n'          {yylval.char_constant = new CharConstant('\n'); BEGIN(INITIAL); return(CHAR_CONSTANT);}
+\\r'          {yylval.char_constant = new CharConstant('\r'); BEGIN(INITIAL); return(CHAR_CONSTANT);}
+\\b'          {yylval.char_constant = new CharConstant('\b'); BEGIN(INITIAL); return(CHAR_CONSTANT);}
+\\t'          {yylval.char_constant = new CharConstant('\t'); BEGIN(INITIAL); return(CHAR_CONSTANT);}
+\\f'          {yylval.char_constant = new CharConstant('\f'); BEGIN(INITIAL); return(CHAR_CONSTANT);}
+[[:print:]]'  {yylval.char_constant = new CharConstant(yytext[0]); BEGIN(INITIAL); return(CHAR_CONSTANT);}
+'             {yyerror("Invalid character constant: A character constant must not be empty."); BEGIN(INITIAL);}
+\n            {yyerror("Invalid Character constant: Newline is not allowed in a character constant. Constant may be unclosed."); yylineno++; BEGIN(INITIAL);}
+.             {yyerror("Invalid Character constant: Invalid character or more than a single represented character."); BEGIN(INITIAL);}
 }
 
-\"[^\"\r\n]*\" {yylval.str_ptr = strdup(yytext); return(STRING_CONSTANT);}
+\"[^\"\r\n]*\" {yylval.string_constant = new StringConstant(yytext); return(STRING_CONSTANT);}
 
 "$".*[\n]     yylineno++;// Ignore one-line comments
 

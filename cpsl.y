@@ -1,28 +1,83 @@
 %verbose
 %debug
 %error-verbose
-%{
-#include <cstring>
-#include "cpsl.h"
-%}
 
-%{
-extern "C"
-{
-  int yylex(void);
+%code requires {
+
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#define YY_TYPEDEF_YY_SCANNER_T
+#include "symbol_table/symbol.h"
+#include "symbol_table/symbol_table.h"
+#include "ast/ast_node.h"
+#include "ast/program.h"
+#include "ast/statement_list.h"
+#include "ast/statement.h"
+#include "ast/write_statement.h"
+#include "ast/stop_statement.h"
+#include "ast/expression_list.h"
+#include "ast/expression.h"
+#include "ast/add_expression.h"
+#include "ast/constant.h"
+#include "ast/integer_constant.h"
+#include "ast/char_constant.h"
+#include "ast/string_constant.h"
+#include "ast/identifier.h"
+#include "ast/emit_ast_node_visitor.h"
+
+#endif
+
 }
-extern "C" int yyparse();
-extern "C" FILE *yyin;
 
+
+%{
+extern "C" int yylex(void);
+extern "C" int yyparse();
+#include <stdio.h>
+extern "C" FILE *yyin;
 void yyerror(const char *s);
 %}
 
+
+%{
+#include <cstring>
+#include "vector"
+#include "symbol_table/symbol.h"
+#include "symbol_table/symbol_table.h"
+#include "ast/ast_node.h"
+#include "ast/program.h"
+#include "ast/statement_list.h"
+#include "ast/statement.h"
+#include "ast/write_statement.h"
+#include "ast/stop_statement.h"
+#include "ast/expression_list.h"
+#include "ast/expression.h"
+#include "ast/add_expression.h"
+#include "ast/constant.h"
+#include "ast/integer_constant.h"
+#include "ast/char_constant.h"
+#include "ast/string_constant.h"
+#include "ast/identifier.h"
+#include "ast/emit_ast_node_visitor.h"
+
+Program* root;
+%}
+
+
 %union {
-  int int_val;
-  char char_val;
-  char *str_ptr;
-  char *identifier_ptr;
-};
+  Program* program;
+  StatementList* statement_list;
+  Statement* statement;
+  WriteStatement* write_statement;
+  StopStatement* stop_statment;
+  ExpressionList* expression_list;
+  Expression* expression;
+  Constant* constant;
+  IntegerConstant* integer_constant;
+  CharConstant* char_constant;
+  StringConstant* string_constant;
+  Identifier* identifier;
+}
+
 
 %token ARRAY_KEYWORD
 %token BEGIN_KEYWORD
@@ -58,10 +113,22 @@ void yyerror(const char *s);
 %token NOT_EQUAL_OPERATOR
 %token LESS_THAN_OR_EQUAL_OPERATOR
 %token GREATER_THAN_OR_EQUAL_OPERATOR
-%token <identifier_ptr> IDENTIFIER
-%token <char_val> CHAR_CONSTANT
-%token <str_ptr> STRING_CONSTANT
-%token <int_val> INTEGER_CONSTANT
+
+%token <identifier> IDENTIFIER
+%token <char_constant> CHAR_CONSTANT
+%token <string_constant> STRING_CONSTANT
+%token <integer_constant> INTEGER_CONSTANT
+
+/* <type> non-terminal */
+%type <program> program
+%type <statement_list> statement_sequence
+%type <statement_list> block
+%type <statement> statement
+%type <stop_statement> stopstatement
+%type <write_statement> writestatement
+%type <expression_list> inner_write
+%type <expression> expression
+%type <expression> const_expression
 
 %right NEG
 %left '*' '/' '%'
@@ -71,6 +138,8 @@ void yyerror(const char *s);
 %left '&'
 %left '|'
 
+%start program
+
 %%
 
 program: constant_decl
@@ -78,31 +147,23 @@ program: constant_decl
          var_decl
          routine
          block
-         '.'
+         '.' { $$ = new Program(*$5); root = $$; }
          ;
 
 constant_decl: CONST_KEYWORD const_statement
                |
                ;
 
-const_statement: IDENTIFIER '=' const_expression ';' {
-                                                       Symbol_Table::getInstance().addIdentifier($1);
-                                                     }
-                 | const_statement IDENTIFIER '=' const_expression ';' {
-                                                        Symbol_Table::getInstance().addIdentifier($2);
-                                                     }
+const_statement: IDENTIFIER '=' const_expression ';'
+                 | const_statement IDENTIFIER '=' const_expression ';'
                  ;
 
 type_decl: TYPE_KEYWORD type_statement
            |
            ;
 
-type_statement: IDENTIFIER '=' type ';' {
-                                          Symbol_Table::getInstance().addType($1);
-                                        }
-                | type_statement IDENTIFIER '=' type ';' {
-                                                           Symbol_Table::getInstance().addType($2);
-                                                         }
+type_statement: IDENTIFIER '=' type ';'
+                | type_statement IDENTIFIER '=' type ';'
                 ;
 
 type: simple_type
@@ -124,12 +185,8 @@ record_type_statement: ident_list_decl
                        ;
 
 
-ident_list: IDENTIFIER {
-                         Symbol_Table::getInstance().addIdentifier($1);
-                       }
-            | ident_list ',' IDENTIFIER {
-                                          Symbol_Table::getInstance().addIdentifier($3);
-                                        }
+ident_list: IDENTIFIER
+            | ident_list ',' IDENTIFIER
             ;
 
 array_type: ARRAY_KEYWORD '[' const_expression ':' const_expression ']' OF_KEYWORD type
@@ -150,26 +207,18 @@ routine: procedure_decl
          |
          ;
 
-scope_start:
-       {Symbol_Table::getInstance().pushScope()}
-       ;
-
-procedure_ident: PROCEDURE_KEYWORD IDENTIFIER {
-                                                Symbol_Table::getInstance().addIdentifier($2);
-                                              }
+procedure_ident: PROCEDURE_KEYWORD IDENTIFIER
                  ;
 
-procedure_decl: procedure_ident '(' scope_start formal_parameters ')' ';' FORWARD_KEYWORD ';' {Symbol_Table::getInstance().popScope()}
-                | procedure_ident '(' scope_start formal_parameters ')' ';' body ';' {Symbol_Table::getInstance().popScope()}
+procedure_decl: procedure_ident '(' formal_parameters ')' ';' FORWARD_KEYWORD ';'
+                | procedure_ident '(' formal_parameters ')' ';' body ';'
                 ;
 
-function_ident: FUNCTION_KEYWORD IDENTIFIER {
-                                              Symbol_Table::getInstance().addIdentifier($2);
-                                            }
+function_ident: FUNCTION_KEYWORD IDENTIFIER
                 ;
 
-function_decl: function_ident '(' scope_start formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';' {Symbol_Table::getInstance().popScope()}
-               | function_ident '(' scope_start formal_parameters ')' ':' type ';' body ';' {Symbol_Table::getInstance().popScope()}
+function_decl: function_ident '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
+               | function_ident '(' formal_parameters ')' ':' type ';' body ';'
                ;
 
 formal_parameters: VAR_KEYWORD ident_list ':' type
@@ -180,10 +229,11 @@ formal_parameters: VAR_KEYWORD ident_list ':' type
 
 body: constant_decl type_decl var_decl block ;
 
-block: BEGIN_KEYWORD statement_sequence END_KEYWORD ;
+block: BEGIN_KEYWORD statement_sequence END_KEYWORD { $$ = $2; }
+       ;
 
-statement_sequence: statement
-                    | statement_sequence ';' statement
+statement_sequence: statement { $$ = new StatementList(); $$->push_back($1); }
+                    | statement_sequence ';' statement {$$->push_back($3);}
                     ;
 
 statement: assignment
@@ -191,10 +241,10 @@ statement: assignment
            | whilestatement
            | repeatstatement
            | forstatement
-           | stopstatement
+           | stopstatement { $$ = new StopStatement(); }
            | returnstatement
            | readstatement
-           | writestatement
+           | writestatement { $$ = $1; }
            | procedurecall
            | nullstatement
            ;
@@ -233,11 +283,13 @@ readstatement: READ_KEYWORD '(' inner_read ')';
 
 inner_read: lvalue
             | inner_read ',' lvalue
+            ;
 
-writestatement: WRITE_KEYWORD '(' inner_write ')';
+writestatement: WRITE_KEYWORD '(' inner_write ')' { $$ = new WriteStatement(*$3); }
+              ;
 
-inner_write: expression
-             | inner_write ',' expression
+inner_write: expression { $$ = new ExpressionList(); $$->push_back($1); }
+             | inner_write ',' expression { $$->push_back($3); }
              |
              ;
 
@@ -253,7 +305,7 @@ expression: expression '|' expression
             | expression GREATER_THAN_OR_EQUAL_OPERATOR expression
             | expression '<' expression
             | expression '>' expression
-            | expression '+' expression
+            | expression '+' expression { $$ = new AddExpression(*$1, *$3); }
             | expression '-' expression
             | expression '*' expression
             | expression '/' expression
@@ -266,7 +318,8 @@ expression: expression '|' expression
             | ORD_KEYWORD '(' expression ')'
             | PRED_KEYWORD '(' expression ')'
             | SUCC_KEYWORD '(' expression ')'
-            | const_expression
+            | const_expression { $$ = $1; }
+            | lvalue
             ;
 
 inside_expr: expression
@@ -274,10 +327,9 @@ inside_expr: expression
              |
              ;
 
-const_expression: INTEGER_CONSTANT
+const_expression: INTEGER_CONSTANT { $$ = $1; }
                   | CHAR_CONSTANT
                   | STRING_CONSTANT
-                  | lvalue
                   ;
 
 lvalue: IDENTIFIER lvalue_sub
@@ -297,7 +349,6 @@ int main(int argc, char* argv[]) {
   {
     if( strncmp(argv[0], "-v", 2) == 0 )
     {
-      std::cout << argv[0];
       ++argv;
       --argc; // Remove flag
       verbose = true;
@@ -313,18 +364,17 @@ int main(int argc, char* argv[]) {
     yyin = stdin;
   }
   // yydebug = 1;
-  if( verbose )
-  {
-    std::cout << "Identifier" << "  Offset" << std::endl;
-  }
 
-  do {
-    yyparse();
-  } while (!feof(yyin));
+  yyparse();
+
+  EmitASTNodeVisitor vs;
+
+  root->accept(vs);
 
   if( verbose )
   {
-    std::cout << Symbol_Table::getInstance();
+    //std::cout << "Identifier" << "  Offset" << std::endl;
+    //std::cout << Symbol_Table::getInstance();
   }
 
   return 0;

@@ -1,27 +1,33 @@
+#Bison Version 3.0
+BISON=/usr/local/opt/bison/bin/bison
+FLEX=flex
 CC=/usr/local/bin/g++-4.8
+SOURCES=$(wildcard **/*.cpp)
+HEADERS=$(wildcard **/*.h)
+CFLAGS=-Wall -g -std=c++11 -Wno-unused-function
+LDFLAGS=-lfl -ll -ly
+EXECUTABLE=cpsl
+MARS=../Mars4_4.jar
 
-all: test
+all: clean test
+
+run:
+	java -jar $(MARS) output.asm
 
 test: build
-	./cpsl -v test/syntax.cpsl
+	./cpsl -v test/expression.cpsl
 
-build: cpsl.tab.c lex.yy.c symbol.cpp symbol_table.cpp
-	$(CC) -g -std=c++11 cpsl.tab.c lex.yy.c symbol.cpp symbol_table.cpp -lfl -ll -ly -o cpsl
-
-test_lex: build_lex
-	./cpsl_lexer test/lex.cpsl
-
-build_lex: lex.yy.c
-	$(CC) -std=c++11 lex.yy.c -o cpsl_lexer
+build: cpsl.tab.c lex.yy.c $(SOURCES)
+	$(CC) $(CFLAGS) $(LDFLAGS) cpsl.tab.c lex.yy.c $(SOURCES) -o $(EXECUTABLE)
 
 lex.yy.c: cpsl.lex cpsl.tab.c cpsl.tab.h
-	flex cpsl.lex
+	$(FLEX) cpsl.lex
 
 cpsl.tab.c cpsl.tab.h: cpsl.y
-	bison -d cpsl.y
+	$(BISON) -d cpsl.y
 
 zip: clean
-	zip cpsl_bowen_masco.zip cpsl.lex cpsl.y symbol.h symbol.cpp symbol_table.h symbol_table.cpp makefile
+	zip cpsl_bowen_masco.zip cpsl.lex cpsl.y $(SOURCES) $(HEADERS) makefile
 
 clean:
 	rm -f lex.yy.c

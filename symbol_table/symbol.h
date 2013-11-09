@@ -1,5 +1,5 @@
-#ifndef SYMBOL_H
-#define SYMBOL_H
+#ifndef __SYMBOL_H
+#define __SYMBOL_H
 
 #include <stack>
 #include <map>
@@ -52,12 +52,8 @@ class Function : public Type {
 class Procedure : public Type {
 };
 
-class Identifier : public Type {
+class Id : public Type {
   using Type::Type;
 };
 
-class Constant : public Symbol {
-  using Symbol::Symbol;
-};
-
-#endif //SYMBOL_H
+#endif //__SYMBOL_H

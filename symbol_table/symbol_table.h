@@ -24,8 +24,8 @@ public:
 
   friend std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table);
 
-  void addIdentifier(std::string identifier);
-  void addType(std::string identifier);
+  void addId(std::string id);
+  void addType(std::string id);
   void pushScope();
   void popScope();
   void setVerbose();
