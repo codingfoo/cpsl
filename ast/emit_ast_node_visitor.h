@@ -26,6 +26,7 @@ private:
   void emitHeader(std::string header);
   void emitLabel(std::string label);
   void emitCode(std::string code);
+  void emitData(std::string label, std::string type, std::string data);
   std::ofstream asmfile;
 };
 

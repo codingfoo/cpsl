@@ -108,13 +108,15 @@ Program* root;
 %token <integer_constant> INTEGER_CONSTANT
 
 /* <type> non-terminal */
+/*
 %type <constant> const_expression
 %type <constant> expression
 %type <constant> inner_write
 %type <write_statement> writestatement
 %type <stop_statement> stopstatement
-%type <statement_list> statement_sequence
+*/
 %type <statement> statement
+%type <statement_list> statement_sequence
 %type <statement_list> block
 %type <program> program
 
@@ -273,10 +275,10 @@ inner_read: lvalue
             | inner_read ',' lvalue
             ;
 
-writestatement: WRITE_KEYWORD '(' inner_write ')' { $$ = new WriteStatement(*$3); }
+writestatement: WRITE_KEYWORD '(' inner_write ')'
               ;
 
-inner_write: expression { $$ = $1; }
+inner_write: expression
              | inner_write ',' expression
              |
              ;
@@ -306,7 +308,7 @@ expression: expression '|' expression
             | ORD_KEYWORD '(' expression ')'
             | PRED_KEYWORD '(' expression ')'
             | SUCC_KEYWORD '(' expression ')'
-            | const_expression { $$ = $1; }
+            | const_expression
             | lvalue
             ;
 

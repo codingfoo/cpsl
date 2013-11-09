@@ -27,9 +27,15 @@ void EmitASTNodeVisitor::emitCode(std::string code)
   asmfile << '\t' << code << std::endl;
 }
 
+void EmitASTNodeVisitor::emitData(std::string label, std::string type, std::string data)
+{
+  asmfile << label << ':' << '\t' << '.' << type << '\t' << data << std::endl;
+}
+
 void EmitASTNodeVisitor::visit( Program & ast_node )
 {
-  emitHeader(".globl main");
+  emitHeader(".data");
+  emitHeader(".text");
   emitLabel("main:");
 
   ast_node.getStatementList().accept(*this);
@@ -40,16 +46,39 @@ void EmitASTNodeVisitor::visit( Program & ast_node )
 
 void EmitASTNodeVisitor::visit( StatementList & ast_node )
 {
-  std::cout << "StatementList"<< std::endl;
+  for (auto it = ast_node.getStatementList().begin(); it != ast_node.getStatementList().end(); it++) {
+    (*it)->accept(*this);
+  }
 }
 
-void EmitASTNodeVisitor::visit( IntegerConstant & ast_node ) {}
+void EmitASTNodeVisitor::visit( Statement & ast_node )
+{
+  std::cerr << "Error: The Statement method should never be called!" << std::endl;
+}
+
 void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
 {
-  std::cout << "WriteStatement"<< std::endl;
+  std::cout << "Write Statement" << std::endl;
+
+  /*
+  print_int    1 $a0 = integer to be printed
+  print_float  2 $f12 = float to be printed
+  print_double 3 $f12 = double to be printed
+  print_string 4 $a0 = address of string in memory
+  */
+
+  emitCode("li  $v0, 1"); // load appropriate system call code into register $v0
+  emitCode("move  $a0, $t2"); // set up register corresponding to sys call
+  emitCode("syscall"); // make syscall
 }
+
+void EmitASTNodeVisitor::visit( StopStatement & ast_node )
+{
+  std::cout << "Stop Statement" << std::endl;
+}
+void EmitASTNodeVisitor::visit( IntegerConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( StringConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( Identifier & ast_node ) {}
-void EmitASTNodeVisitor::visit( StopStatement & ast_node ) {}
-void EmitASTNodeVisitor::visit( Statement & ast_node ) {}
+
+

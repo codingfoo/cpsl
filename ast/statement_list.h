@@ -10,7 +10,7 @@ public:
   explicit StatementList();
   void push_back(Statement* statement);
   void accept(ASTNodeVisitor &v);
-  std::vector<Statement*>& getStatementList(){ return _list; }
+  std::vector<Statement*>& getStatementList();
 private:
   std::vector<Statement*> _list;
 };
