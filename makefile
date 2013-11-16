@@ -11,7 +11,8 @@ MARS=../Mars4_4.jar
 
 all: clean test
 
-run:
+run: build
+	./cpsl -v test/expression.cpsl
 	java -jar $(MARS) output.asm
 
 test: build
