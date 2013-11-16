@@ -17,6 +17,8 @@
 #include "ast/expression_list.h"
 #include "ast/expression.h"
 #include "ast/add_expression.h"
+#include "ast/sub_expression.h"
+#include "ast/mul_expression.h"
 #include "ast/constant.h"
 #include "ast/integer_constant.h"
 #include "ast/char_constant.h"
@@ -52,6 +54,8 @@ void yyerror(const char *s);
 #include "ast/expression_list.h"
 #include "ast/expression.h"
 #include "ast/add_expression.h"
+#include "ast/sub_expression.h"
+#include "ast/mul_expression.h"
 #include "ast/constant.h"
 #include "ast/integer_constant.h"
 #include "ast/char_constant.h"
@@ -306,8 +310,8 @@ expression: expression '|' expression
             | expression '<' expression
             | expression '>' expression
             | expression '+' expression { $$ = new AddExpression(*$1, *$3); }
-            | expression '-' expression
-            | expression '*' expression
+            | expression '-' expression { $$ = new SubExpression(*$1, *$3); }
+            | expression '*' expression { $$ = new MulExpression(*$1, *$3); }
             | expression '/' expression
             | expression '%' expression
             | '~' expression

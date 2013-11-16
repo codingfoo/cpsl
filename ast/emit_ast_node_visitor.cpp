@@ -5,6 +5,7 @@
 #include "expression_type.h"
 #include "integer_constant.h"
 #include "add_expression.h"
+#include "sub_expression.h"
 #include "ast_node_visitor.h"
 #include "emit_ast_node_visitor.h"
 
@@ -105,6 +106,32 @@ void EmitASTNodeVisitor::visit( AddExpression & ast_node )
   emitCode("add  $t0,$t1,$t2");
 }
 
+void EmitASTNodeVisitor::visit( SubExpression & ast_node )
+{
+  ast_node.getLeft().accept(*this);
+
+  emitCode("add  $t1,$t0,$zero");
+
+  ast_node.getRight().accept(*this);
+
+  emitCode("add  $t2,$t0,$zero");
+
+  emitCode("sub  $t0,$t1,$t2");
+}
+
+void EmitASTNodeVisitor::visit( SubExpression & ast_node )
+{
+  ast_node.getLeft().accept(*this);
+
+  emitCode("add  $t1,$t0,$zero");
+
+  ast_node.getRight().accept(*this);
+
+  emitCode("add  $t2,$t0,$zero");
+
+  emitCode("mul  $t0,$t1,$t2");
+}
+
 void EmitASTNodeVisitor::visit( IntegerConstant & ast_node )
 {
   if(ast_node.getType() == INTEGER_EXPRESSION)
@@ -112,8 +139,9 @@ void EmitASTNodeVisitor::visit( IntegerConstant & ast_node )
     emitCode("li  $t0, " + std::to_string(ast_node.getValue()) );
   }
 }
+
+void EmitASTNodeVisitor::visit( Identifier & ast_node ) {}
 void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( StringConstant & ast_node ) {}
-void EmitASTNodeVisitor::visit( Identifier & ast_node ) {}
 
 

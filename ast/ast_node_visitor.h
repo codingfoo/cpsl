@@ -9,6 +9,8 @@ class WriteStatement;
 class ExpressionList;
 class Expression;
 class AddExpression;
+class SubExpression;
+class MulExpression;
 class IntegerConstant;
 class CharConstant;
 class StringConstant;
@@ -26,6 +28,8 @@ public:
   virtual void visit( ExpressionList & ast_node ) = 0;
   virtual void visit( Expression & ast_node ) = 0;
   virtual void visit( AddExpression & ast_node ) = 0;
+  virtual void visit( SubExpression & ast_node ) = 0;
+  virtual void visit( MulExpression & ast_node ) = 0;
   virtual void visit( IntegerConstant &ast_node ) = 0;
   virtual void visit( CharConstant &ast_node ) = 0;
   virtual void visit( StringConstant &ast_node ) = 0;
