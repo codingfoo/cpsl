@@ -9,16 +9,16 @@ LDFLAGS=-lfl -ll -ly
 EXECUTABLE=cpsl
 MARS=../Mars4_4.jar
 
-all: clean test
+all: $(EXECUTABLE)
 
-run: build
+run: $(EXECUTABLE)
 	./cpsl -v test/expression.cpsl
 	java -jar $(MARS) output.asm
 
-test: build
+test: $(EXECUTABLE)
 	./cpsl -v test/expression.cpsl
 
-build: cpsl.tab.c lex.yy.c $(SOURCES)
+$(EXECUTABLE): cpsl.tab.c lex.yy.c $(SOURCES)
 	$(CC) $(CFLAGS) $(LDFLAGS) cpsl.tab.c lex.yy.c $(SOURCES) -o $(EXECUTABLE)
 
 lex.yy.c: cpsl.lex cpsl.tab.c cpsl.tab.h
