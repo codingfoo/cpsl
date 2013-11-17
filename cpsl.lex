@@ -55,7 +55,7 @@ write|WRITE {return(WRITE_KEYWORD);}
 
 "+"  {return(yytext[0]);}
 "-"  {return(yytext[0]);}
-"∗"  {return(yytext[0]);}
+"*"  {return(yytext[0]);}
 "/"  {return(yytext[0]);}
 "&"  {return(yytext[0]);}
 "|"  {return(yytext[0]);}
@@ -102,6 +102,6 @@ write|WRITE {return(WRITE_KEYWORD);}
 \t         // Ignore whitespace
 \n         yylineno++;
 
-. {yyerror("Unrecognized character.");}
+. {yyerror("Unrecognized character: "); printf("%c\n", yytext[0]);}
 
 %%
