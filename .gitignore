@@ -5,3 +5,4 @@ cpsl.tab.c
 cpsl.tab.h
 cpsl
 cpsl.output
+*.asm
