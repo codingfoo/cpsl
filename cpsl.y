@@ -134,13 +134,14 @@ Program* root;
 %type <expression> expression
 %type <expression> const_expression
 
-%right NEG
-%left '*' '/' '%'
-%left '+' '-'
-%nonassoc '=' NOT_EQUAL_OPERATOR '<' LESS_THAN_OR_EQUAL_OPERATOR '>' GREATER_THAN_OR_EQUAL_OPERATOR
-%right '~'
-%left '&'
+/* highest precedence -> lowest on the screen */
 %left '|'
+%left '&'
+%right '~'
+%nonassoc '=' NOT_EQUAL_OPERATOR '<' LESS_THAN_OR_EQUAL_OPERATOR '>' GREATER_THAN_OR_EQUAL_OPERATOR
+%left '+' '-'
+%left '*' '/' '%'
+%right NEG
 
 %start program
 
