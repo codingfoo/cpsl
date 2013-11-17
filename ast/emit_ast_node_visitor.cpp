@@ -6,6 +6,7 @@
 #include "integer_constant.h"
 #include "add_expression.h"
 #include "sub_expression.h"
+#include "mul_expression.h"
 #include "ast_node_visitor.h"
 #include "emit_ast_node_visitor.h"
 
@@ -119,7 +120,7 @@ void EmitASTNodeVisitor::visit( SubExpression & ast_node )
   emitCode("sub  $t0,$t1,$t2");
 }
 
-void EmitASTNodeVisitor::visit( SubExpression & ast_node )
+void EmitASTNodeVisitor::visit( MulExpression & ast_node )
 {
   ast_node.getLeft().accept(*this);
 
