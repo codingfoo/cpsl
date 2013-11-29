@@ -23,6 +23,7 @@ public:
   virtual void visit( AddExpression & ast_node );
   virtual void visit( SubExpression & ast_node );
   virtual void visit( MulExpression & ast_node );
+  virtual void visit( DivExpression & ast_node );
   virtual void visit( IntegerConstant & ast_node );
   virtual void visit( CharConstant & ast_node );
   virtual void visit( StringConstant & ast_node );

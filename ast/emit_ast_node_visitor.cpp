@@ -7,6 +7,7 @@
 #include "add_expression.h"
 #include "sub_expression.h"
 #include "mul_expression.h"
+#include "div_expression.h"
 #include "ast_node_visitor.h"
 #include "emit_ast_node_visitor.h"
 
@@ -131,6 +132,19 @@ void EmitASTNodeVisitor::visit( MulExpression & ast_node )
   emitCode("add  $t2,$t0,$zero");
 
   emitCode("mul  $t0,$t1,$t2");
+}
+
+void EmitASTNodeVisitor::visit( DivExpression & ast_node )
+{
+  ast_node.getLeft().accept(*this);
+
+  emitCode("add  $t1,$t0,$zero");
+
+  ast_node.getRight().accept(*this);
+
+  emitCode("add  $t2,$t0,$zero");
+
+  emitCode("div  $t0,$t1,$t2");
 }
 
 void EmitASTNodeVisitor::visit( IntegerConstant & ast_node )
