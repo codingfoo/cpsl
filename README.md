@@ -3,7 +3,6 @@ CPSL Compiler
 
 Tasks
 =====
-types: boolean, integer, char, string
 expressions
   :=
   >
@@ -76,3 +75,7 @@ symbol name | type | scope | memory location(offset) | value
 symbol : metadata( type scope offset value )
 
 how to handle scopes
+
+types: boolean, integer, char, string
+
+symbol : metadata
