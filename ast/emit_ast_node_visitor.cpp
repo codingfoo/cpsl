@@ -1,6 +1,7 @@
 #include <string>
 
 #include "program.h"
+#include "read_statement.h"
 #include "write_statement.h"
 #include "expression_type.h"
 #include "integer_constant.h"
@@ -63,6 +64,20 @@ void EmitASTNodeVisitor::visit( StatementList & ast_node )
 void EmitASTNodeVisitor::visit( Statement & ast_node )
 {
   std::cerr << "Error: The Statement method should never be called!" << std::endl;
+}
+
+void EmitASTNodeVisitor::visit( ReadStatement & ast_node )
+{
+  if( ast_node.getIdentifier().getType() == INTEGER_EXPRESSION )
+  {
+    emitCode("li  $v0, 5"); // load appropriate system call code into register $v0
+    emitCode("syscall"); // make syscall
+    emitCode("move  $v0, $t0"); // set up register corresponding to sys call
+  }
+
+  if( ast_node.getIdentifier().getType() == STRING_EXPRESSION )
+  {
+  }
 }
 
 void EmitASTNodeVisitor::visit( WriteStatement & ast_node )

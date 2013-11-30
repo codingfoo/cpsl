@@ -6,6 +6,7 @@ class StatementList;
 class Statement;
 class StopStatement;
 class WriteStatement;
+class ReadStatement;
 class ExpressionList;
 class Expression;
 class AddExpression;
@@ -25,6 +26,7 @@ public:
   virtual void visit( StatementList &ast_node ) = 0;
   virtual void visit( Statement &ast_node ) = 0;
   virtual void visit( StopStatement &ast_node ) = 0;
+  virtual void visit( ReadStatement &ast_node ) = 0;
   virtual void visit( WriteStatement &ast_node ) = 0;
   virtual void visit( ExpressionList & ast_node ) = 0;
   virtual void visit( Expression & ast_node ) = 0;

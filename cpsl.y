@@ -6,13 +6,12 @@
 
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
-#include "symbol_table/symbol.h"
-#include "symbol_table/symbol_table.h"
 #include "ast/ast_node.h"
 #include "ast/program.h"
 #include "ast/statement_list.h"
 #include "ast/statement.h"
 #include "ast/write_statement.h"
+#include "ast/read_statement.h"
 #include "ast/stop_statement.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
@@ -44,13 +43,12 @@ void yyerror(const char *s);
 %{
 #include <cstring>
 #include "vector"
-#include "symbol_table/symbol.h"
-#include "symbol_table/symbol_table.h"
 #include "ast/ast_node.h"
 #include "ast/program.h"
 #include "ast/statement_list.h"
 #include "ast/statement.h"
 #include "ast/write_statement.h"
+#include "ast/read_statement.h"
 #include "ast/stop_statement.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
@@ -73,6 +71,7 @@ Program* root;
   Program* program;
   StatementList* statement_list;
   Statement* statement;
+  ReadStatement* read_statement;
   WriteStatement* write_statement;
   StopStatement* stop_statment;
   ExpressionList* expression_list;
@@ -131,6 +130,7 @@ Program* root;
 %type <statement_list> block
 %type <statement> statement
 %type <stop_statement> stopstatement
+%type <read_statement> readstatement
 %type <write_statement> writestatement
 %type <expression_list> inner_write
 %type <expression> expression
