@@ -10,9 +10,9 @@ class ReadStatement : public Statement {
 public:
   explicit ReadStatement(Identifier identifier) : _identifier(identifier) {}
   void accept(ASTNodeVisitor &v);
-  Identifier& getIdentifier();
+  Identifier getIdentifier();
 private:
-  Identifier& _identifier;
+  Identifier _identifier;
 };
 
 #endif // __READ_STATEMENT_H

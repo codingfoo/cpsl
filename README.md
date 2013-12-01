@@ -12,6 +12,7 @@ expressions
   +
   <
   <=
+symbol table( how to handle scopes? )
 statements
   read
   write
@@ -21,7 +22,6 @@ control structures
   if
   repeat
   while
-symbol table
 udt
 function calls
 move main into seperate file
@@ -31,7 +31,6 @@ add options parser(gnuopt)
      in file / std in (set yyin rather than )
      out file
 mixed pointers
-
 
 
 Special Cases For Lexer
@@ -70,12 +69,6 @@ symbols
 – Scope 1 – global (main) level
 – Scope 2 – inside procedures and functions
 
-symbol name | type | scope | memory location(offset) | value
-
 symbol : metadata( type scope offset value )
 
-how to handle scopes
-
-types: boolean, integer, char, string
-
-symbol : metadata
+base types: boolean, integer, char, string

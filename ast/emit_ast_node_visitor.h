@@ -21,6 +21,7 @@ public:
   virtual void visit( WriteStatement & ast_node );
   virtual void visit( ExpressionList & ast_node );
   virtual void visit( Expression & ast_node );
+  virtual void visit( IdentifierExpression & ast_node );
   virtual void visit( AddExpression & ast_node );
   virtual void visit( SubExpression & ast_node );
   virtual void visit( MulExpression & ast_node );

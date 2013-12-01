@@ -22,13 +22,13 @@ public:
     return instance;
   }
 
-  friend std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table);
-
-  void addId(std::string id);
-  void addType(std::string id);
-  void pushScope();
-  void popScope();
+  void addSymbol(std::string symbol, std::string type);
+  // void pushScope();
+  // void popScope();
   void setVerbose();
+
+  Symbol_Map& getSymbolTable();
+  friend std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table);
 
 private:
   Symbol_Table();
@@ -37,7 +37,7 @@ private:
   void incrementOffset();
 
   int _next_offset;
-  std::vector<Symbol_Map> scoped_symbol_table;
+  Symbol_Map _global_symbol_table;
   bool _verbose;
 };
 

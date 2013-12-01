@@ -2,6 +2,6 @@
 
 std::ostream& operator<< (std::ostream &out, Symbol &symbol)
 {
-    out << symbol._offset;
+    out << "symbol";
     return out;
 }

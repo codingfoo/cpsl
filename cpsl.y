@@ -15,6 +15,7 @@
 #include "ast/stop_statement.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
+#include "ast/identifier_expression.h"
 #include "ast/add_expression.h"
 #include "ast/sub_expression.h"
 #include "ast/mul_expression.h"
@@ -43,6 +44,7 @@ void yyerror(const char *s);
 %{
 #include <cstring>
 #include "vector"
+#include "symbol_table/symbol_table.h"
 #include "ast/ast_node.h"
 #include "ast/program.h"
 #include "ast/statement_list.h"
@@ -50,6 +52,7 @@ void yyerror(const char *s);
 #include "ast/write_statement.h"
 #include "ast/read_statement.h"
 #include "ast/stop_statement.h"
+#include "ast/identifier_expression.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
 #include "ast/add_expression.h"
@@ -135,6 +138,12 @@ Program* root;
 %type <expression_list> inner_write
 %type <expression> expression
 %type <expression> const_expression
+%type <identifier> simple_type
+%type <identifier> type
+%type <identifier> ident_list_decl
+%type <identifier> ident_list
+%type <identifier> lvalue
+%type <identifier> inner_read
 
 /* highest precedence -> lowest on the screen */
 %left '|'
@@ -173,18 +182,19 @@ type_statement: IDENTIFIER '=' type ';'
                 | type_statement IDENTIFIER '=' type ';'
                 ;
 
-type: simple_type
+type: simple_type { $$ = $1; }
       | record_type
       | array_type
       ;
 
-simple_type: IDENTIFIER
+simple_type: IDENTIFIER { $$ = $1; }
              ;
 
 record_type: RECORD_KEYWORD record_type_statement END_KEYWORD
              ;
 
-ident_list_decl: ident_list ':' type ';';
+ident_list_decl: ident_list ':' type ';' { Symbol_Table::getInstance().addSymbol($1->getValue(), $3->getValue()); $$ = $1; }
+                 ;
 
 record_type_statement: ident_list_decl
                        | record_type_statement ident_list_decl
@@ -192,7 +202,7 @@ record_type_statement: ident_list_decl
                        ;
 
 
-ident_list: IDENTIFIER
+ident_list: IDENTIFIER { $$ = $1; }
             | ident_list ',' IDENTIFIER
             ;
 
@@ -250,7 +260,7 @@ statement: assignment
            | forstatement
            | stopstatement { $$ = new StopStatement(); }
            | returnstatement
-           | readstatement
+           | readstatement { $$ = $1; }
            | writestatement { $$ = $1; }
            | procedurecall
            | nullstatement
@@ -286,9 +296,10 @@ returnstatement: RETURN_KEYWORD
                  | RETURN_KEYWORD expression
                  ;
 
-readstatement: READ_KEYWORD '(' inner_read ')';
+readstatement: READ_KEYWORD '(' inner_read ')' { $$ = new ReadStatement(*$3); }
+               ;
 
-inner_read: lvalue
+inner_read: lvalue { $$ = $1; }
             | inner_read ',' lvalue
             ;
 
@@ -326,7 +337,7 @@ expression: expression '|' expression
             | PRED_KEYWORD '(' expression ')'
             | SUCC_KEYWORD '(' expression ')'
             | const_expression { $$ = $1; }
-            | lvalue
+            | lvalue { $$ = new IdentifierExpression(*$1); }
             ;
 
 inside_expr: expression
@@ -339,7 +350,7 @@ const_expression: INTEGER_CONSTANT { $$ = $1; }
                   | STRING_CONSTANT
                   ;
 
-lvalue: IDENTIFIER lvalue_sub
+lvalue: IDENTIFIER lvalue_sub { $$ = $1; }
 
 lvalue_sub: lvalue_sub '.' IDENTIFIER
             | lvalue_sub '[' expression ']'
@@ -372,11 +383,17 @@ int main(int argc, char* argv[]) {
   }
   // yydebug = 1;
 
+  std::cout << "before parse" << std::endl;
+
   yyparse();
+
+  std::cout << "after parse" << std::endl;
 
   EmitASTNodeVisitor vs;
 
   root->accept(vs);
+
+  std::cout << "after visit" << std::endl;
 
   if( verbose )
   {

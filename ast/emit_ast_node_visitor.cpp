@@ -1,10 +1,13 @@
 #include <string>
+#include <iostream>
 
+#include "../symbol_table/symbol_table.h"
 #include "program.h"
 #include "read_statement.h"
 #include "write_statement.h"
 #include "expression_type.h"
 #include "integer_constant.h"
+#include "identifier_expression.h"
 #include "add_expression.h"
 #include "sub_expression.h"
 #include "mul_expression.h"
@@ -45,6 +48,9 @@ void EmitASTNodeVisitor::emitData(std::string label, std::string type, std::stri
 void EmitASTNodeVisitor::visit( Program & ast_node )
 {
   emitHeader(".data");
+  for (auto it = Symbol_Table::getInstance().getSymbolTable().begin(); it != Symbol_Table::getInstance().getSymbolTable().end(); it++) {
+     emitData( it->first, "word", "0" );
+  }
   emitHeader(".text");
   emitLabel("main:");
 
@@ -68,16 +74,9 @@ void EmitASTNodeVisitor::visit( Statement & ast_node )
 
 void EmitASTNodeVisitor::visit( ReadStatement & ast_node )
 {
-  if( ast_node.getIdentifier().getType() == INTEGER_EXPRESSION )
-  {
-    emitCode("li  $v0, 5"); // load appropriate system call code into register $v0
+    emitCode("li  $v0, 5  #Read Statement"); // load appropriate system call code into register $v0
     emitCode("syscall"); // make syscall
-    emitCode("move  $v0, $t0"); // set up register corresponding to sys call
-  }
-
-  if( ast_node.getIdentifier().getType() == STRING_EXPRESSION )
-  {
-  }
+    emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
 }
 
 void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
@@ -91,7 +90,7 @@ void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
 
     if( (*it)->getType() == INTEGER_EXPRESSION )
     {
-      emitCode("li  $v0, 1"); // load appropriate system call code into register $v0
+      emitCode("li  $v0, 1  #Write Statement"); // load appropriate system call code into register $v0
       emitCode("move  $a0, $t0"); // set up register corresponding to sys call
       emitCode("syscall"); // make syscall
     }
@@ -110,6 +109,10 @@ void EmitASTNodeVisitor::visit( StopStatement & ast_node ) {}
 
 void EmitASTNodeVisitor::visit( ExpressionList & ast_node ) {}
 void EmitASTNodeVisitor::visit( Expression & ast_node ) {}
+void EmitASTNodeVisitor::visit( IdentifierExpression & ast_node )
+{
+}
+
 void EmitASTNodeVisitor::visit( AddExpression & ast_node )
 {
   ast_node.getLeft().accept(*this);
