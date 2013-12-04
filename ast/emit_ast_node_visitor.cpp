@@ -74,9 +74,18 @@ void EmitASTNodeVisitor::visit( Statement & ast_node )
 
 void EmitASTNodeVisitor::visit( ReadStatement & ast_node )
 {
-    emitCode("li  $v0, 5  #Read Statement"); // load appropriate system call code into register $v0
-    emitCode("syscall"); // make syscall
-    emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
+    if( ast_node.getIdentifier().getType() == INTEGER_EXPRESSION )
+    {
+      emitCode("li  $v0, 5  #Read Integer statement"); // load appropriate system call code into register $v0
+      emitCode("syscall"); // make syscall
+      emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
+    }
+    else
+     }
+      emitCode("li  $v0, 12  #Read char statement"); // load appropriate system call code into register $v0
+      emitCode("syscall"); // make syscall
+      emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
+    }
 }
 
 void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
@@ -97,7 +106,7 @@ void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
 
     if( (*it)->getType() == STRING_EXPRESSION )
     {
-      emitCode("li  $v0, 4"); // load appropriate system call code into register $v0
+      emitCode("li  $v0, 4 #Write string"); // load appropriate system call code into register $v0
       // TODO: lookup label in symbol table
       emitCode("move  $a0, $t0"); // set up register corresponding to sys call
       emitCode("syscall"); // make syscall
