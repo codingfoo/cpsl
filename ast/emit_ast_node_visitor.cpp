@@ -1,12 +1,14 @@
 #include <string>
 #include <iostream>
 
+#include "../symbol_table/symbol_metadata.h"
 #include "../symbol_table/symbol_table.h"
 #include "program.h"
 #include "read_statement.h"
 #include "write_statement.h"
 #include "expression_type.h"
 #include "integer_constant.h"
+#include "string_constant.h"
 #include "identifier_expression.h"
 #include "add_expression.h"
 #include "sub_expression.h"
@@ -18,6 +20,7 @@
 EmitASTNodeVisitor::EmitASTNodeVisitor()
 {
   asmfile.open("./output.asm", std::ios::trunc);
+  constantCounter = 0;
 }
 
 EmitASTNodeVisitor::~EmitASTNodeVisitor()
@@ -40,24 +43,34 @@ void EmitASTNodeVisitor::emitCode(std::string code)
   asmfile << '\t' << code << std::endl;
 }
 
-void EmitASTNodeVisitor::emitData(std::string label, std::string type, std::string data)
+void EmitASTNodeVisitor::emitData(std::string label, Cpsl_Base_Type type, std::string data)
 {
-  asmfile << label << ':' << '\t' << '.' << type << '\t' << data << std::endl;
+  std::string mips_type = "word";
+  if(type == CPSL_STRING)
+  {
+    mips_type = "asciiz";
+  }
+  asmfile << label << ':' << '\t' << '.' << mips_type << '\t' << data << std::endl;
 }
 
 void EmitASTNodeVisitor::visit( Program & ast_node )
 {
-  emitHeader(".data");
-  for (auto it = Symbol_Table::getInstance().getSymbolTable().begin(); it != Symbol_Table::getInstance().getSymbolTable().end(); it++) {
-     emitData( it->first, "word", "0" );
-  }
   emitHeader(".text");
+  emitHeader(".globl  main");
   emitLabel("main:");
 
   ast_node.getStatementList().accept(*this);
 
-  emitCode("li $v0, 10");
+  emitCode("li $v0, 10  #Exit syscall");
   emitCode("syscall");
+
+  emitHeader(".data");
+  std::string label;
+  std::string data;
+  for (auto it = Symbol_Table::getInstance().getSymbolTable().begin(); it != Symbol_Table::getInstance().getSymbolTable().end(); it++) {
+    label = it->second.label != "" ? it->second.label : it->first;
+    emitData( label , it->second.type, it->second.value );
+  }
 }
 
 void EmitASTNodeVisitor::visit( StatementList & ast_node )
@@ -76,13 +89,13 @@ void EmitASTNodeVisitor::visit( ReadStatement & ast_node )
 {
   if( ast_node.getIdentifier().getType() == INTEGER_EXPRESSION )
   {
-    emitCode("li  $v0, 5  #Read Integer statement"); // load appropriate system call code into register $v0
+    emitCode("li  $v0, 5  #Read integer"); // load appropriate system call code into register $v0
     emitCode("syscall"); // make syscall
     emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
   }
   else
   {
-    emitCode("li  $v0, 12  #Read char statement"); // load appropriate system call code into register $v0
+    emitCode("li  $v0, 12  #Read char"); // load appropriate system call code into register $v0
     emitCode("syscall"); // make syscall
     emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
   }
@@ -99,7 +112,7 @@ void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
 
     if( (*it)->getType() == INTEGER_EXPRESSION )
     {
-      emitCode("li  $v0, 1  #Write Statement"); // load appropriate system call code into register $v0
+      emitCode("li  $v0, 1  #Write integer"); // load appropriate system call code into register $v0
       emitCode("move  $a0, $t0"); // set up register corresponding to sys call
       emitCode("syscall"); // make syscall
     }
@@ -114,23 +127,15 @@ void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
   }
 }
 
-void EmitASTNodeVisitor::visit( StopStatement & ast_node ) {}
-
-void EmitASTNodeVisitor::visit( ExpressionList & ast_node ) {}
-void EmitASTNodeVisitor::visit( Expression & ast_node ) {}
-void EmitASTNodeVisitor::visit( IdentifierExpression & ast_node )
-{
-}
-
 void EmitASTNodeVisitor::visit( AddExpression & ast_node )
 {
   ast_node.getLeft().accept(*this);
 
-  emitCode("add  $t1,$t0,$zero");
+  emitCode("move  $t1,$t0");
 
   ast_node.getRight().accept(*this);
 
-  emitCode("add  $t2,$t0,$zero");
+  emitCode("move  $t2,$t0");
 
   emitCode("add  $t0,$t1,$t2");
 }
@@ -139,11 +144,11 @@ void EmitASTNodeVisitor::visit( SubExpression & ast_node )
 {
   ast_node.getLeft().accept(*this);
 
-  emitCode("add  $t1,$t0,$zero");
+  emitCode("move  $t1,$t0");
 
   ast_node.getRight().accept(*this);
 
-  emitCode("add  $t2,$t0,$zero");
+  emitCode("move  $t2,$t0");
 
   emitCode("sub  $t0,$t1,$t2");
 }
@@ -152,11 +157,11 @@ void EmitASTNodeVisitor::visit( MulExpression & ast_node )
 {
   ast_node.getLeft().accept(*this);
 
-  emitCode("add  $t1,$t0,$zero");
+  emitCode("move  $t1,$t0");
 
   ast_node.getRight().accept(*this);
 
-  emitCode("add  $t2,$t0,$zero");
+  emitCode("move  $t2,$t0");
 
   emitCode("mul  $t0,$t1,$t2");
 }
@@ -165,11 +170,11 @@ void EmitASTNodeVisitor::visit( DivExpression & ast_node )
 {
   ast_node.getLeft().accept(*this);
 
-  emitCode("add  $t1,$t0,$zero");
+  emitCode("move  $t1,$t0");
 
   ast_node.getRight().accept(*this);
 
-  emitCode("add  $t2,$t0,$zero");
+  emitCode("move  $t2,$t0");
 
   emitCode("div  $t0,$t1,$t2");
 }
@@ -182,8 +187,21 @@ void EmitASTNodeVisitor::visit( IntegerConstant & ast_node )
   }
 }
 
+void EmitASTNodeVisitor::visit( StringConstant & ast_node )
+{
+  Symbol_Metadata metadata = SymbolMetadataInitilizer;
+  metadata.type = CPSL_STRING;
+  metadata.label = "constant" + std::to_string(constantCounter++);
+  metadata.value = ast_node.getValue();
+  Symbol_Table::getInstance().addSymbol(ast_node.getValue(), metadata );
+  emitCode("la  $t0, " + metadata.label );
+}
+
 void EmitASTNodeVisitor::visit( Identifier & ast_node ) {}
 void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
-void EmitASTNodeVisitor::visit( StringConstant & ast_node ) {}
+void EmitASTNodeVisitor::visit( StopStatement & ast_node ) {}
+void EmitASTNodeVisitor::visit( ExpressionList & ast_node ) {}
+void EmitASTNodeVisitor::visit( Expression & ast_node ) {}
+void EmitASTNodeVisitor::visit( IdentifierExpression & ast_node ) {}
 
 

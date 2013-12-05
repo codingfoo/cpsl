@@ -7,16 +7,16 @@ HEADERS=$(wildcard **/*.h)
 CFLAGS=-Wall -g -std=c++11 -Wno-unused-function
 LDFLAGS=-ll -ly
 EXECUTABLE=cpsl
-TEST_FILE=test/test.cpsl
+TEST_FILE=test/personnel.cpsl
 MARS=../Mars4_4.jar
 
 all: $(EXECUTABLE)
 
-run: $(EXECUTABLE)
+run: $(EXECUTABLE) $(TEST_FILE)
 	./cpsl -v $(TEST_FILE)
 	java -jar $(MARS) output.asm
 
-test: $(EXECUTABLE)
+test: $(EXECUTABLE) $(TEST_FILE)
 	./cpsl -v $(TEST_FILE)
 
 $(EXECUTABLE): cpsl.tab.c lex.yy.c $(SOURCES)

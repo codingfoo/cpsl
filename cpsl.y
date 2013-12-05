@@ -310,7 +310,8 @@ inner_write: expression { $$ = new ExpressionList(); $$->push_back($1); }
              | inner_write ',' expression { $$->push_back($3); }
              ;
 
-procedurecall: IDENTIFIER '(' inner_write ')';
+procedurecall: IDENTIFIER '(' inner_write ')'
+               | IDENTIFIER'(' ')';
 
 nullstatement: ;
 
@@ -336,6 +337,9 @@ expression: expression '|' expression
             | PRED_KEYWORD '(' expression ')'
             | SUCC_KEYWORD '(' expression ')'
             | lvalue { $$ = new IdentifierExpression(*$1); }
+            | INTEGER_CONSTANT { $$ = $1; }
+            | CHAR_CONSTANT { $$ = $1; }
+            | STRING_CONSTANT { $$ = $1; }
             ;
 
 inside_expr: expression

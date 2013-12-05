@@ -1,10 +1,11 @@
+#include "symbol_metadata.h"
 #include "symbol_table.h"
 
 std::ostream& operator<< (std::ostream &out, Symbol_Map symbol_map)
 {
-  for ( std::map<std::string, std::shared_ptr<Symbol>>::const_iterator iter = symbol_map.begin(); iter != symbol_map.end(); ++iter )
+  for ( auto iter = symbol_map.begin(); iter != symbol_map.end(); ++iter )
   {
-    std::cout << iter->first << '\t' << *iter->second << '\n';
+    std::cout << iter->first << '\t' << iter->second.symbol << '\n';
   }
   return out;
 }
@@ -64,7 +65,14 @@ Symbol_Table::Symbol_Table() :  _next_offset(0), _verbose(false)
 
 void Symbol_Table::addSymbol(std::string symbol, std::string type)
 {
-  _global_symbol_table[symbol] = std::make_shared<Symbol>(symbol, CPSL_INTEGER, 0);
+  Symbol_Metadata metadata = SymbolMetadataInitilizer;
+  metadata.type = CPSL_INTEGER;
+  Symbol_Table::getInstance().addSymbol(symbol, metadata );
+}
+
+void Symbol_Table::addSymbol(std::string symbol, Symbol_Metadata metadata)
+{
+  _global_symbol_table[symbol] = metadata;
 }
 
 Symbol_Map& Symbol_Table::getSymbolTable()

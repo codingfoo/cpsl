@@ -9,9 +9,9 @@
 #include <algorithm> // for copy
 #include <iterator> // for ostream_iterator
 
-#include "symbol.h"
+#include "symbol_metadata.h"
 
-typedef std::map<std::string, std::shared_ptr<Symbol>> Symbol_Map;
+typedef std::map<std::string, Symbol_Metadata> Symbol_Map;
 
 class Symbol_Table
 {
@@ -23,6 +23,7 @@ public:
   }
 
   void addSymbol(std::string symbol, std::string type);
+  void addSymbol(std::string symbol, Symbol_Metadata metadata);
   // void pushScope();
   // void popScope();
   void setVerbose();

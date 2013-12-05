@@ -7,6 +7,7 @@
 #include <string>
 
 #include "ast_node_visitor.h"
+#include "../symbol_table/cpsl_base_type.h"
 
 class EmitASTNodeVisitor : public ASTNodeVisitor
 {
@@ -35,8 +36,9 @@ private:
   void emitHeader(std::string header);
   void emitLabel(std::string label);
   void emitCode(std::string code);
-  void emitData(std::string label, std::string type, std::string data);
+  void emitData(std::string label, Cpsl_Base_Type type, std::string data);
   std::ofstream asmfile;
+  int constantCounter;
 };
 
 #endif //__EMIT_AST_NODE_VISITOR

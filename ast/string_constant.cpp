@@ -8,6 +8,11 @@ Expression_Type StringConstant::getType()
   return STRING_EXPRESSION;
 }
 
+std::string StringConstant::getValue()
+{
+  return _value;
+}
+
 std::ostream& operator<< (std::ostream &out, const StringConstant &obj)
 {
     out << obj._value;
