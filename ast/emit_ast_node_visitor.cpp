@@ -74,18 +74,18 @@ void EmitASTNodeVisitor::visit( Statement & ast_node )
 
 void EmitASTNodeVisitor::visit( ReadStatement & ast_node )
 {
-    if( ast_node.getIdentifier().getType() == INTEGER_EXPRESSION )
-    {
-      emitCode("li  $v0, 5  #Read Integer statement"); // load appropriate system call code into register $v0
-      emitCode("syscall"); // make syscall
-      emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
-    }
-    else
-     }
-      emitCode("li  $v0, 12  #Read char statement"); // load appropriate system call code into register $v0
-      emitCode("syscall"); // make syscall
-      emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
-    }
+  if( ast_node.getIdentifier().getType() == INTEGER_EXPRESSION )
+  {
+    emitCode("li  $v0, 5  #Read Integer statement"); // load appropriate system call code into register $v0
+    emitCode("syscall"); // make syscall
+    emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
+  }
+  else
+  {
+    emitCode("li  $v0, 12  #Read char statement"); // load appropriate system call code into register $v0
+    emitCode("syscall"); // make syscall
+    emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
+  }
 }
 
 void EmitASTNodeVisitor::visit( WriteStatement & ast_node )

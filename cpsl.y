@@ -308,7 +308,6 @@ writestatement: WRITE_KEYWORD '(' inner_write ')' { $$ = new WriteStatement(*$3)
 
 inner_write: expression { $$ = new ExpressionList(); $$->push_back($1); }
              | inner_write ',' expression { $$->push_back($3); }
-             |
              ;
 
 procedurecall: IDENTIFIER '(' inner_write ')';
@@ -336,7 +335,6 @@ expression: expression '|' expression
             | ORD_KEYWORD '(' expression ')'
             | PRED_KEYWORD '(' expression ')'
             | SUCC_KEYWORD '(' expression ')'
-            | const_expression { $$ = $1; }
             | lvalue { $$ = new IdentifierExpression(*$1); }
             ;
 
@@ -346,16 +344,14 @@ inside_expr: expression
              ;
 
 const_expression: INTEGER_CONSTANT { $$ = $1; }
-                  | CHAR_CONSTANT
-                  | STRING_CONSTANT
+                  | CHAR_CONSTANT { $$ = $1; }
+                  | STRING_CONSTANT { $$ = $1; }
+                  | IDENTIFIER { $$ = new IdentifierExpression(*$1); }
                   ;
 
-lvalue: IDENTIFIER lvalue_sub { $$ = $1; }
-
-lvalue_sub: lvalue_sub '.' IDENTIFIER
-            | lvalue_sub '[' expression ']'
-            |
-            ;
+lvalue: IDENTIFIER { $$ = $1; }
+        | lvalue '.' IDENTIFIER { $$ = $1; }
+        | lvalue '[' expression ']' { $$ = $1; }
 
 %%
 

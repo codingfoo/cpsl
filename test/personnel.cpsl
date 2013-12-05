@@ -48,7 +48,7 @@ begin
     read(c);
     i := i + 1;
   until c = '\n';
-  while i <= NAMELEN do
+  while i <= NAMELEN do $pad with spaces
     a[i] := ' ';
     i := i+1;
   end;

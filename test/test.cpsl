@@ -1,0 +1,10 @@
+const
+  TABLEN = 20;
+  NAMELEN = 24;
+
+type
+  ntype = array[1:NAMELEN] of char;
+
+begin
+  write("hello");
+end.

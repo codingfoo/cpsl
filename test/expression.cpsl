@@ -1,8 +1,0 @@
-var
-  persons : integer;
-
-begin
-  read(persons);
-  write(persons);
-  write(3*3/3);
-end.
