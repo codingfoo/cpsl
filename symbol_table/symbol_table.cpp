@@ -18,11 +18,11 @@ std::ostream& operator<< (std::ostream &out, std::vector<Symbol_Map> symbol_map)
 
 std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table)
 {
-  std::cout << "symbol_table.scoped_symbol_table" << std::endl;
+  std::cout << "symbol table" << std::endl;
   return out;
 }
 
-Symbol_Table::Symbol_Table() :  _next_offset(0), _verbose(false)
+Symbol_Table::Symbol_Table() : _verbose(false)
 {
   // Symbol_Map predefined;
 
@@ -80,43 +80,7 @@ Symbol_Map& Symbol_Table::getSymbolTable()
   return _global_symbol_table;
 }
 
-// void Symbol_Table::addId(std::string id)
-// {
-//   std::shared_ptr<Id> ident(new Id(id, _next_offset));
-//   incrementOffset();
-//   scoped_symbol_table.back()[id] = ident;
-// }
-
-// void Symbol_Table::addType(std::string id)
-// {
-//   std::shared_ptr<Type> ident(new Type(id, _next_offset));
-//   incrementOffset();
-//   scoped_symbol_table.back()[id] = ident;
-// }
-
-void Symbol_Table::incrementOffset()
-{
-  _next_offset+=sizeof(int);
-}
-
 void Symbol_Table::setVerbose()
 {
   _verbose=true;
 }
-
-// void Symbol_Table::pushScope()
-// {
-//   Symbol_Map scope;
-
-//   scoped_symbol_table.push_back(scope);
-// }
-
-// void Symbol_Table::popScope()
-// {
-//   Symbol_Map predefined = scoped_symbol_table.back();
-//   if(_verbose)
-//   {
-//     std::cout << predefined << std::endl;
-//   }
-//   scoped_symbol_table.pop_back();
-// }

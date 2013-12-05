@@ -24,8 +24,6 @@ public:
 
   void addSymbol(std::string symbol, std::string type);
   void addSymbol(std::string symbol, Symbol_Metadata metadata);
-  // void pushScope();
-  // void popScope();
   void setVerbose();
 
   Symbol_Map& getSymbolTable();
@@ -35,9 +33,7 @@ private:
   Symbol_Table();
   Symbol_Table(Symbol_Table const&);   // Leave unimplemented
   void operator=(Symbol_Table const&); // Leave unimplemented
-  void incrementOffset();
 
-  int _next_offset;
   Symbol_Map _global_symbol_table;
   bool _verbose;
 };
