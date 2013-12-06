@@ -11,6 +11,7 @@ class ReadStatement;
 class ExpressionList;
 class Expression;
 class IdentifierExpression;
+class GTExpression;
 class AddExpression;
 class SubExpression;
 class MulExpression;
@@ -34,6 +35,7 @@ public:
   virtual void visit( ExpressionList & ast_node ) = 0;
   virtual void visit( Expression & ast_node ) = 0;
   virtual void visit( IdentifierExpression & ast_node ) = 0;
+  virtual void visit( GTExpression & ast_node ) = 0;
   virtual void visit( AddExpression & ast_node ) = 0;
   virtual void visit( SubExpression & ast_node ) = 0;
   virtual void visit( MulExpression & ast_node ) = 0;

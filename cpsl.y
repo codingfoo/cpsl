@@ -18,6 +18,7 @@
 #include "ast/expression.h"
 #include "ast/identifier_expression.h"
 #include "ast/identifier_constant_expression.h"
+#include "ast/gt_expression.h"
 #include "ast/add_expression.h"
 #include "ast/sub_expression.h"
 #include "ast/mul_expression.h"
@@ -59,6 +60,7 @@ void yyerror(const char *s);
 #include "ast/identifier_constant_expression.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
+#include "ast/gt_expression.h"
 #include "ast/add_expression.h"
 #include "ast/sub_expression.h"
 #include "ast/mul_expression.h"
@@ -342,7 +344,7 @@ expression: expression '|' expression
             | expression LESS_THAN_OR_EQUAL_OPERATOR expression
             | expression GREATER_THAN_OR_EQUAL_OPERATOR expression
             | expression '<' expression
-            | expression '>' expression
+            | expression '>' expression { $$ = new GTExpression(*$1, *$3); }
             | expression '+' expression { $$ = new AddExpression(*$1, *$3); }
             | expression '-' expression { $$ = new SubExpression(*$1, *$3); }
             | expression '*' expression { $$ = new MulExpression(*$1, *$3); }

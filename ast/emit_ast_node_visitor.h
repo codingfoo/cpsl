@@ -24,6 +24,7 @@ public:
   virtual void visit( ExpressionList & ast_node );
   virtual void visit( Expression & ast_node );
   virtual void visit( IdentifierExpression & ast_node );
+  virtual void visit( GTExpression & ast_node );
   virtual void visit( AddExpression & ast_node );
   virtual void visit( SubExpression & ast_node );
   virtual void visit( MulExpression & ast_node );
@@ -40,6 +41,7 @@ private:
   void emitData(std::string label, Cpsl_Base_Type type, std::string data);
   std::ofstream asmfile;
   int constantCounter;
+  int ifCounter;
 };
 
 #endif //__EMIT_AST_NODE_VISITOR

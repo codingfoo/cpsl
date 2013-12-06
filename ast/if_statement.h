@@ -9,10 +9,12 @@
 
 class IfStatement : public Statement {
 public:
-  explicit IfStatement(Expression& expression, StatementList& statements) : _el(expression), _sl(statements) {}
+  explicit IfStatement(Expression& expression, StatementList& statements) : _expression(expression), _sl(statements) {}
   void accept(ASTNodeVisitor &v);
+  Expression& getExpression();
+
 private:
-  Expression& _el;
+  Expression& _expression;
   StatementList& _sl;
 };
 

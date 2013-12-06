@@ -6,10 +6,12 @@
 #include "program.h"
 #include "read_statement.h"
 #include "write_statement.h"
+#include "if_statement.h"
 #include "expression_type.h"
 #include "integer_constant.h"
 #include "string_constant.h"
 #include "identifier_expression.h"
+#include "gt_expression.h"
 #include "add_expression.h"
 #include "sub_expression.h"
 #include "mul_expression.h"
@@ -21,6 +23,7 @@ EmitASTNodeVisitor::EmitASTNodeVisitor()
 {
   asmfile.open("./output.asm", std::ios::trunc);
   constantCounter = 0;
+  ifCounter = 0;
 }
 
 EmitASTNodeVisitor::~EmitASTNodeVisitor()
@@ -88,7 +91,22 @@ void EmitASTNodeVisitor::visit( Statement & ast_node )
 
 void EmitASTNodeVisitor::visit( IfStatement & ast_node )
 {
-  std::cerr << "if" << std::endl;
+  /*"constant" + std::to_string(constantCounter++);
+      //beq  $zero, $t2, ELSE   # branch if ! ( i == j )
+      addi $r1, $r1, 1      # body
+      j L1                  # jump over else  (ADD THIS!!!)
+ELSE: addi $r2, $r2, -1     # j--
+L1:   add $r2, $r2, $r1     # j += i
+*/
+
+  ast_node.getExpression().accept(*this);
+  emitCode("beq  $zero, $t0, ELSE" + std::to_string(constantCounter));
+  // ast_node.getStatementList().accept(*this);
+  emitCode("j END" + std::to_string(constantCounter));
+  emitCode("ELSE" + std::to_string(constantCounter) + ":");
+  // ast_node.getElseStatementList().accept(*this);
+  emitCode("END" + std::to_string(constantCounter) + ":");
+  constantCounter++;
 }
 
 void EmitASTNodeVisitor::visit( ReadStatement & ast_node )
@@ -131,6 +149,19 @@ void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
       emitCode("syscall"); // make syscall
     }
   }
+}
+
+void EmitASTNodeVisitor::visit( GTExpression & ast_node )
+{
+  ast_node.getLeft().accept(*this);
+
+  emitCode("move  $t1,$t0");
+
+  ast_node.getRight().accept(*this);
+
+  emitCode("move  $t2,$t0");
+
+  emitCode("slt  $t0,$t1,$t2");
 }
 
 void EmitASTNodeVisitor::visit( AddExpression & ast_node )
