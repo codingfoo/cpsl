@@ -4,12 +4,15 @@
 #include "../symbol_table/symbol_metadata.h"
 #include "../symbol_table/symbol_table.h"
 #include "program.h"
+#include "function.h"
 #include "read_statement.h"
 #include "write_statement.h"
 #include "if_statement.h"
 #include "expression_type.h"
 #include "integer_constant.h"
 #include "string_constant.h"
+#include "routine.h"
+#include "routine_list.h"
 #include "identifier_expression.h"
 #include "gt_expression.h"
 #include "add_expression.h"
@@ -246,6 +249,23 @@ void EmitASTNodeVisitor::visit( Expression & ast_node ) {}
 void EmitASTNodeVisitor::visit( IdentifierExpression & ast_node )
 {
   emitCode("lw  $t0, " + ast_node.getLocation());
+}
+
+void EmitASTNodeVisitor::visit( Function & ast_node )
+{
+
+}
+
+void EmitASTNodeVisitor::visit( Routine & ast_node )
+{
+
+}
+
+void EmitASTNodeVisitor::visit( RoutineList & ast_node )
+{
+  // for (auto it = ast_node.getRoutineList().begin(); it != ast_node.getRoutineList().end(); it++) {
+  //   (*it)->accept(*this);
+  // }
 }
 
 

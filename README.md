@@ -5,21 +5,16 @@ Tasks
 =====
 expressions
   :=
-  >
   <>
   =
-  -
-  +
   <
   <=
 symbol table( how to handle scopes? )
 statements
-  read
-  write
-  stop
 control structures
   for
-  if
+  elseif
+  else
   repeat
   while
 udt
@@ -31,6 +26,11 @@ add options parser(gnuopt)
      in file / std in (set yyin rather than )
      out file
 mixed pointers
+
+
+read multiple values
+write characters
+stop non main stop
 
 
 Special Cases For Lexer

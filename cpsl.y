@@ -15,6 +15,7 @@
 #include "ast/stop_statement.h"
 #include "ast/if_statement.h"
 #include "ast/expression_list.h"
+#include "ast/function.h"
 #include "ast/expression.h"
 #include "ast/identifier_expression.h"
 #include "ast/identifier_constant_expression.h"
@@ -60,6 +61,7 @@ void yyerror(const char *s);
 #include "ast/identifier_constant_expression.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
+#include "ast/function.h"
 #include "ast/gt_expression.h"
 #include "ast/add_expression.h"
 #include "ast/sub_expression.h"
@@ -84,6 +86,7 @@ Program* root;
   WriteStatement* write_statement;
   StopStatement* stop_statment;
   IfStatement* if_statement;
+  Function* function;
   ExpressionList* expression_list;
   Expression* expression;
   Constant* constant;
@@ -146,6 +149,8 @@ Program* root;
 %type <if_statement> initial_if
 %type <expression_list> inner_write
 %type <expression> expression
+%type <identifier> function_ident
+%type <function> function_decl
 %type <constant> const_expression
 %type <identifier> simple_type
 %type <identifier> type
@@ -237,7 +242,7 @@ var_statement: ident_list_decl
                ;
 
 routine: procedure_decl
-         | function_decl
+         | function_decl {}
          | routine procedure_decl
          | routine function_decl
          |
@@ -250,11 +255,11 @@ procedure_decl: procedure_ident '(' formal_parameters ')' ';' FORWARD_KEYWORD ';
                 | procedure_ident '(' formal_parameters ')' ';' body ';'
                 ;
 
-function_ident: FUNCTION_KEYWORD IDENTIFIER
+function_ident: FUNCTION_KEYWORD IDENTIFIER { $$ = $2; }
                 ;
 
 function_decl: function_ident '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
-               | function_ident '(' formal_parameters ')' ':' type ';' body ';'
+               | function_ident '(' formal_parameters ')' ':' type ';' body ';' { $$ = new Function(*$1); }
                ;
 
 formal_parameters: VAR_KEYWORD ident_list ':' type

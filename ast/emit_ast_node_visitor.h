@@ -21,6 +21,9 @@ public:
   virtual void visit( ReadStatement & ast_node );
   virtual void visit( WriteStatement & ast_node );
   virtual void visit( IfStatement & ast_node );
+  virtual void visit( Function & ast_node );
+  virtual void visit( Routine & ast_node );
+  virtual void visit( RoutineList & ast_node );
   virtual void visit( ExpressionList & ast_node );
   virtual void visit( Expression & ast_node );
   virtual void visit( IdentifierExpression & ast_node );
