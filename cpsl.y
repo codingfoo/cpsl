@@ -13,6 +13,7 @@
 #include "ast/write_statement.h"
 #include "ast/read_statement.h"
 #include "ast/stop_statement.h"
+#include "ast/if_statement.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
 #include "ast/identifier_expression.h"
@@ -53,6 +54,7 @@ void yyerror(const char *s);
 #include "ast/write_statement.h"
 #include "ast/read_statement.h"
 #include "ast/stop_statement.h"
+#include "ast/if_statement.h"
 #include "ast/identifier_expression.h"
 #include "ast/identifier_constant_expression.h"
 #include "ast/expression_list.h"
@@ -79,6 +81,7 @@ Program* root;
   ReadStatement* read_statement;
   WriteStatement* write_statement;
   StopStatement* stop_statment;
+  IfStatement* if_statement;
   ExpressionList* expression_list;
   Expression* expression;
   Constant* constant;
@@ -137,6 +140,7 @@ Program* root;
 %type <stop_statement> stopstatement
 %type <read_statement> readstatement
 %type <write_statement> writestatement
+%type <if_statement> ifstatement
 %type <expression_list> inner_write
 %type <expression> expression
 %type <constant> const_expression
@@ -266,7 +270,7 @@ statement_sequence: statement { $$ = new StatementList(); $$->push_back($1); }
                     ;
 
 statement: assignment
-           | ifstatement
+           | ifstatement { $$ = $1; }
            | whilestatement
            | repeatstatement
            | forstatement
@@ -279,10 +283,13 @@ statement: assignment
            ;
 
 assignment: lvalue ASSIGNS_OPERATOR expression
+            ;
 
-ifstatement: initial_if else_if else END_KEYWORD ;
+ifstatement: initial_if else_if else END_KEYWORD { $$ = new IfStatement();}
+             ;
 
-initial_if: IF_KEYWORD expression THEN_KEYWORD statement_sequence ;
+initial_if: IF_KEYWORD expression THEN_KEYWORD statement_sequence
+            ;
 
 else_if: ELSEIF_KEYWORD expression THEN_KEYWORD statement_sequence
          | else_if ELSEIF_KEYWORD expression THEN_KEYWORD statement_sequence
