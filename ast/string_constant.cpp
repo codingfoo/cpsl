@@ -1,3 +1,5 @@
+#include <string>
+
 #include "string_constant.h"
 #include "ast_node_visitor.h"
 
@@ -9,6 +11,11 @@ Expression_Type StringConstant::getType()
 }
 
 std::string StringConstant::getValue()
+{
+  return _value;
+}
+
+std::string StringConstant::getConstantValue()
 {
   return _value;
 }

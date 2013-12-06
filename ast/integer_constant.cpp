@@ -13,6 +13,11 @@ int IntegerConstant::getValue()
   return _value;
 }
 
+std::string IntegerConstant::getConstantValue()
+{
+  return std::to_string(_value);
+}
+
 std::ostream& operator<< (std::ostream &out, const IntegerConstant &obj)
 {
     out << obj._value;

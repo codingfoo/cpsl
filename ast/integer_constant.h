@@ -10,6 +10,7 @@ public:
   void accept(ASTNodeVisitor &v);
   Expression_Type getType();
   int getValue();
+  std::string getConstantValue();
   friend std::ostream& operator<< (std::ostream &out, const IntegerConstant &obj);
 private:
   int _value;

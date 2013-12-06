@@ -8,6 +8,11 @@ Expression_Type CharConstant::getType()
   return STRING_EXPRESSION;
 }
 
+std::string CharConstant::getConstantValue()
+{
+  return std::to_string(_value);
+}
+
 std::ostream& operator<< (std::ostream &out, const CharConstant &obj)
 {
     out << obj._value;

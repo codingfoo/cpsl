@@ -61,6 +61,7 @@ void EmitASTNodeVisitor::visit( Program & ast_node )
 
   ast_node.getStatementList().accept(*this);
 
+  emitLabel("main_end:");
   emitCode("li $v0, 10  #Exit syscall");
   emitCode("syscall");
 

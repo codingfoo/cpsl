@@ -16,6 +16,7 @@
 #include "ast/expression_list.h"
 #include "ast/expression.h"
 #include "ast/identifier_expression.h"
+#include "ast/identifier_constant_expression.h"
 #include "ast/add_expression.h"
 #include "ast/sub_expression.h"
 #include "ast/mul_expression.h"
@@ -53,6 +54,7 @@ void yyerror(const char *s);
 #include "ast/read_statement.h"
 #include "ast/stop_statement.h"
 #include "ast/identifier_expression.h"
+#include "ast/identifier_constant_expression.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
 #include "ast/add_expression.h"
@@ -137,7 +139,7 @@ Program* root;
 %type <write_statement> writestatement
 %type <expression_list> inner_write
 %type <expression> expression
-%type <expression> const_expression
+%type <constant> const_expression
 %type <identifier> simple_type
 %type <identifier> type
 %type <identifier> ident_list_decl
@@ -170,8 +172,18 @@ constant_decl: CONST_KEYWORD const_statement
                |
                ;
 
-const_statement: IDENTIFIER '=' const_expression ';'
-                 | const_statement IDENTIFIER '=' const_expression ';'
+const_statement: IDENTIFIER '=' const_expression ';' {
+  Symbol_Metadata metadata = SymbolMetadataInitilizer;
+  metadata.label = $1->getValue();
+  metadata.value = $3->getConstantValue();
+  Symbol_Table::getInstance().addSymbol($1->getValue(), metadata );
+  }
+                 | const_statement IDENTIFIER '=' const_expression ';' {
+  Symbol_Metadata metadata = SymbolMetadataInitilizer;
+  metadata.label = $2->getValue();
+  metadata.value = $4->getConstantValue();
+  Symbol_Table::getInstance().addSymbol($2->getValue(), metadata );
+  }
                  ;
 
 type_decl: TYPE_KEYWORD type_statement
@@ -350,7 +362,7 @@ inside_expr: expression
 const_expression: INTEGER_CONSTANT { $$ = $1; }
                   | CHAR_CONSTANT { $$ = $1; }
                   | STRING_CONSTANT { $$ = $1; }
-                  | IDENTIFIER { $$ = new IdentifierExpression(*$1); }
+                  | IDENTIFIER { $$ = new IdentifierConstantExpression(*$1); }
                   ;
 
 lvalue: IDENTIFIER { $$ = $1; }
