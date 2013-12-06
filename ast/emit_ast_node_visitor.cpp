@@ -71,6 +71,8 @@ void EmitASTNodeVisitor::visit( Program & ast_node )
   emitCode("li $v0, 10  #Exit syscall");
   emitCode("syscall");
 
+  ast_node.getRoutineList().accept(*this);
+
   emitHeader(".data");
   std::string label;
   std::string data;
@@ -253,19 +255,19 @@ void EmitASTNodeVisitor::visit( IdentifierExpression & ast_node )
 
 void EmitASTNodeVisitor::visit( Function & ast_node )
 {
-
+  std::cout << ast_node.getName() << std::endl;
 }
 
 void EmitASTNodeVisitor::visit( Routine & ast_node )
 {
-
+  std::cerr << "Error: The Statement method should never be called!" << std::endl;
 }
 
 void EmitASTNodeVisitor::visit( RoutineList & ast_node )
 {
-  // for (auto it = ast_node.getRoutineList().begin(); it != ast_node.getRoutineList().end(); it++) {
-  //   (*it)->accept(*this);
-  // }
+  for (auto it = ast_node.getRoutineList().begin(); it != ast_node.getRoutineList().end(); it++) {
+    (*it)->accept(*this);
+  }
 }
 
 

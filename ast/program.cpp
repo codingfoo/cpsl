@@ -6,3 +6,8 @@ StatementList& Program::getStatementList()
 {
   return _sl;
 }
+
+RoutineList& Program::getRoutineList()
+{
+  return _rl;
+}

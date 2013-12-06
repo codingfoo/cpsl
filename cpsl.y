@@ -59,6 +59,8 @@ void yyerror(const char *s);
 #include "ast/if_statement.h"
 #include "ast/identifier_expression.h"
 #include "ast/identifier_constant_expression.h"
+#include "ast/routine.h"
+#include "ast/routine_list.h"
 #include "ast/expression_list.h"
 #include "ast/expression.h"
 #include "ast/function.h"
@@ -87,6 +89,7 @@ Program* root;
   StopStatement* stop_statment;
   IfStatement* if_statement;
   Function* function;
+  RoutineList* routine_list;
   ExpressionList* expression_list;
   Expression* expression;
   Constant* constant;
@@ -148,6 +151,7 @@ Program* root;
 %type <if_statement> ifstatement
 %type <if_statement> initial_if
 %type <expression_list> inner_write
+%type <routine_list> routine
 %type <expression> expression
 %type <identifier> function_ident
 %type <function> function_decl
@@ -177,7 +181,7 @@ program: constant_decl
          var_decl
          routine
          block
-         '.' { $$ = new Program(*$5); root = $$; }
+         '.' { $$ = new Program(*$5, *$4); root = $$; }
          ;
 
 constant_decl: CONST_KEYWORD const_statement
@@ -242,10 +246,10 @@ var_statement: ident_list_decl
                ;
 
 routine: procedure_decl
-         | function_decl {}
+         | function_decl { $$ = new RoutineList(); $$->push_back($1); }
          | routine procedure_decl
-         | routine function_decl
-         |
+         | routine function_decl { $$->push_back($2); }
+         | { $$ = new RoutineList(); }
          ;
 
 procedure_ident: PROCEDURE_KEYWORD IDENTIFIER
