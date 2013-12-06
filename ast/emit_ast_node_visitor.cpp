@@ -91,22 +91,14 @@ void EmitASTNodeVisitor::visit( Statement & ast_node )
 
 void EmitASTNodeVisitor::visit( IfStatement & ast_node )
 {
-  /*"constant" + std::to_string(constantCounter++);
-      //beq  $zero, $t2, ELSE   # branch if ! ( i == j )
-      addi $r1, $r1, 1      # body
-      j L1                  # jump over else  (ADD THIS!!!)
-ELSE: addi $r2, $r2, -1     # j--
-L1:   add $r2, $r2, $r1     # j += i
-*/
-
   ast_node.getExpression().accept(*this);
-  emitCode("beq  $zero, $t0, ELSE" + std::to_string(constantCounter));
-  // ast_node.getStatementList().accept(*this);
-  emitCode("j END" + std::to_string(constantCounter));
-  emitCode("ELSE" + std::to_string(constantCounter) + ":");
+  emitCode("beq  $zero, $t0, else" + std::to_string(ifCounter));
+  ast_node.getStatements().accept(*this);
+  emitCode("j end" + std::to_string(ifCounter));
+  emitCode("else" + std::to_string(ifCounter) + ":");
   // ast_node.getElseStatementList().accept(*this);
-  emitCode("END" + std::to_string(constantCounter) + ":");
-  constantCounter++;
+  emitCode("end" + std::to_string(ifCounter) + ":");
+  ifCounter++;
 }
 
 void EmitASTNodeVisitor::visit( ReadStatement & ast_node )
@@ -144,7 +136,13 @@ void EmitASTNodeVisitor::visit( WriteStatement & ast_node )
     if( (*it)->getType() == STRING_EXPRESSION )
     {
       emitCode("li  $v0, 4 #Write string"); // load appropriate system call code into register $v0
-      // TODO: lookup label in symbol table
+      emitCode("move  $a0, $t0"); // set up register corresponding to sys call
+      emitCode("syscall"); // make syscall
+    }
+
+    if( (*it)->getType() == IDENTIFIER_EXPRESSION )
+    {
+      emitCode("li  $v0, 1  #Write integer"); // load appropriate system call code into register $v0
       emitCode("move  $a0, $t0"); // set up register corresponding to sys call
       emitCode("syscall"); // make syscall
     }
@@ -161,7 +159,7 @@ void EmitASTNodeVisitor::visit( GTExpression & ast_node )
 
   emitCode("move  $t2,$t0");
 
-  emitCode("slt  $t0,$t1,$t2");
+  emitCode("slt  $t0,$t2,$t1");
 }
 
 void EmitASTNodeVisitor::visit( AddExpression & ast_node )
@@ -234,11 +232,20 @@ void EmitASTNodeVisitor::visit( StringConstant & ast_node )
   emitCode("la  $t0, " + metadata.label );
 }
 
-void EmitASTNodeVisitor::visit( Identifier & ast_node ) {}
+void EmitASTNodeVisitor::visit( Identifier & ast_node )
+{
+  //std::cout << "Identifier"<< std::endl;
+}
 void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
-void EmitASTNodeVisitor::visit( StopStatement & ast_node ) {}
+void EmitASTNodeVisitor::visit( StopStatement & ast_node )
+{
+  emitCode("j main_end");
+}
 void EmitASTNodeVisitor::visit( ExpressionList & ast_node ) {}
 void EmitASTNodeVisitor::visit( Expression & ast_node ) {}
-void EmitASTNodeVisitor::visit( IdentifierExpression & ast_node ) {}
+void EmitASTNodeVisitor::visit( IdentifierExpression & ast_node )
+{
+  emitCode("lw  $t0, " + ast_node.getLocation());
+}
 
 

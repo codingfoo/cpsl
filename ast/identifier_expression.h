@@ -9,6 +9,7 @@ public:
   explicit IdentifierExpression(Identifier& ident);
   void accept(ASTNodeVisitor &v);
   Expression_Type getType();
+  std::string getLocation();
 private:
   Identifier _ident;
 };

@@ -12,6 +12,7 @@ public:
   explicit IfStatement(Expression& expression, StatementList& statements) : _expression(expression), _sl(statements) {}
   void accept(ASTNodeVisitor &v);
   Expression& getExpression();
+  StatementList& getStatements();
 
 private:
   Expression& _expression;

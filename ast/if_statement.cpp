@@ -7,3 +7,8 @@ Expression& IfStatement::getExpression()
 {
   return _expression;
 }
+
+StatementList& IfStatement::getStatements()
+{
+  return _sl;
+}

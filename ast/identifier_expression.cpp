@@ -3,7 +3,11 @@
 
 IdentifierExpression::IdentifierExpression(Identifier& ident) : _ident(ident) {}
 void IdentifierExpression::accept(ASTNodeVisitor &v) { v.visit(*this); }
+std::string IdentifierExpression::getLocation()
+{
+  return _ident.getValue();
+}
 Expression_Type IdentifierExpression::getType()
 {
-  return INVALID_EXPRESSION;
+  return IDENTIFIER_EXPRESSION;
 }

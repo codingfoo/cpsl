@@ -5,7 +5,7 @@ void CharConstant::accept(ASTNodeVisitor &v) { v.visit(*this); }
 
 Expression_Type CharConstant::getType()
 {
-  return STRING_EXPRESSION;
+  return CHAR_EXPRESSION;
 }
 
 std::string CharConstant::getConstantValue()
