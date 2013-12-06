@@ -86,6 +86,11 @@ void EmitASTNodeVisitor::visit( Statement & ast_node )
   std::cerr << "Error: The Statement method should never be called!" << std::endl;
 }
 
+void EmitASTNodeVisitor::visit( IfStatement & ast_node )
+{
+  std::cerr << "if" << std::endl;
+}
+
 void EmitASTNodeVisitor::visit( ReadStatement & ast_node )
 {
   if( ast_node.getIdentifier().getType() == INTEGER_EXPRESSION )

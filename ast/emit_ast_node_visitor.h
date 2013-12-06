@@ -20,6 +20,7 @@ public:
   virtual void visit( StopStatement & ast_node );
   virtual void visit( ReadStatement & ast_node );
   virtual void visit( WriteStatement & ast_node );
+  virtual void visit( IfStatement & ast_node );
   virtual void visit( ExpressionList & ast_node );
   virtual void visit( Expression & ast_node );
   virtual void visit( IdentifierExpression & ast_node );

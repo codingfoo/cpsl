@@ -141,6 +141,7 @@ Program* root;
 %type <read_statement> readstatement
 %type <write_statement> writestatement
 %type <if_statement> ifstatement
+%type <if_statement> initial_if
 %type <expression_list> inner_write
 %type <expression> expression
 %type <constant> const_expression
@@ -285,10 +286,10 @@ statement: assignment
 assignment: lvalue ASSIGNS_OPERATOR expression
             ;
 
-ifstatement: initial_if else_if else END_KEYWORD { $$ = new IfStatement();}
+ifstatement: initial_if else_if else END_KEYWORD { $$ = $1; }
              ;
 
-initial_if: IF_KEYWORD expression THEN_KEYWORD statement_sequence
+initial_if: IF_KEYWORD expression THEN_KEYWORD statement_sequence { $$ = new IfStatement(*$2, *$4); }
             ;
 
 else_if: ELSEIF_KEYWORD expression THEN_KEYWORD statement_sequence
