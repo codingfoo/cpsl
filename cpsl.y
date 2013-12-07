@@ -81,6 +81,7 @@ void yyerror(const char *s);
 #include "ast/emit_ast_node_visitor.h"
 
 Program* root;
+bool global=true;
 %}
 
 
@@ -232,7 +233,12 @@ simple_type: IDENTIFIER { $$ = $1; }
 record_type: RECORD_KEYWORD record_type_statement END_KEYWORD
              ;
 
-ident_list_decl: ident_list ':' type ';' { Symbol_Table::getInstance().addSymbol($1->getValue(), $3->getValue()); $$ = $1; }
+ident_list_decl: ident_list ':' type ';' {
+if( global )
+{
+Symbol_Table::getInstance().addSymbol($1->getValue(), $3->getValue());
+}
+$$ = $1; }
                  ;
 
 record_type_statement: ident_list_decl
@@ -248,8 +254,8 @@ ident_list: IDENTIFIER { $$ = $1; }
 array_type: ARRAY_KEYWORD '[' const_expression ':' const_expression ']' OF_KEYWORD type
             ;
 
-var_decl: VAR_KEYWORD var_statement
-          |
+var_decl: VAR_KEYWORD var_statement  { global=false; }
+          |  { global=false;}
           ;
 
 var_statement: ident_list_decl

@@ -33,7 +33,7 @@ zip: clean
 
 clean:
 	rm -f lex.yy.c
-	rm -f output.asm
+	:> output.asm
 	rm -f cpsl_lexer
 	rm -rf cpsl.dSYM
 	rm -f cpsl.tab.c
