@@ -132,4 +132,5 @@ begin
   write("\n\tSorted by name:\n\n");
   namesort();
   printtable();
+  stop;
 end.

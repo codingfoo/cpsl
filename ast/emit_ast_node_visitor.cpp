@@ -1,10 +1,12 @@
 #include <string>
 #include <iostream>
 
+#include <typeinfo>
 #include "../symbol_table/symbol_metadata.h"
 #include "../symbol_table/symbol_table.h"
 #include "program.h"
 #include "function.h"
+#include "function_call.h"
 #include "read_statement.h"
 #include "write_statement.h"
 #include "if_statement.h"
@@ -84,9 +86,12 @@ void EmitASTNodeVisitor::visit( Program & ast_node )
 
 void EmitASTNodeVisitor::visit( StatementList & ast_node )
 {
+  std::cout << "Size: " << ast_node.getStatementList().size() << std::endl;
   for (auto it = ast_node.getStatementList().begin(); it != ast_node.getStatementList().end(); it++) {
+    std::cout << "ID: " << typeid(*it).name() << std::endl;
     (*it)->accept(*this);
   }
+  std::cout << std::endl;
 }
 
 void EmitASTNodeVisitor::visit( Statement & ast_node )
@@ -96,6 +101,7 @@ void EmitASTNodeVisitor::visit( Statement & ast_node )
 
 void EmitASTNodeVisitor::visit( IfStatement & ast_node )
 {
+  std::cout << "if" << std::endl;
   ast_node.getExpression().accept(*this);
   emitCode("beq  $zero, $t0, else" + std::to_string(ifCounter));
   ast_node.getStatements().accept(*this);
@@ -244,10 +250,10 @@ void EmitASTNodeVisitor::visit( Identifier & ast_node )
 void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
 void EmitASTNodeVisitor::visit( StopStatement & ast_node )
 {
-  emitCode("j main_end");
+  std::cout << "stop" << std::endl;
+  emitCode("j main_end  #Stop statement");
 }
-void EmitASTNodeVisitor::visit( ExpressionList & ast_node ) {}
-void EmitASTNodeVisitor::visit( Expression & ast_node ) {}
+
 void EmitASTNodeVisitor::visit( IdentifierExpression & ast_node )
 {
   emitCode("lw  $t0, " + ast_node.getLocation());
@@ -260,9 +266,10 @@ void EmitASTNodeVisitor::visit( Function & ast_node )
   emitCode("jr $ra");
 }
 
-void EmitASTNodeVisitor::visit( Routine & ast_node )
+void EmitASTNodeVisitor::visit( FunctionCall & ast_node )
 {
-  std::cerr << "Error: The Statement method should never be called!" << std::endl;
+  std::cout << ast_node.getName() << std::endl;
+  emitCode("jal " + ast_node.getName());
 }
 
 void EmitASTNodeVisitor::visit( RoutineList & ast_node )
@@ -272,4 +279,22 @@ void EmitASTNodeVisitor::visit( RoutineList & ast_node )
   }
 }
 
+void EmitASTNodeVisitor::visit( NullStatement & ast_node )
+{
+  std::cout << "Null Statement" << std::endl;
+}
 
+void EmitASTNodeVisitor::visit( ExpressionList & ast_node )
+{
+  std::cerr << "Error: The ExpressionList method should never be called!" << std::endl;
+}
+
+void EmitASTNodeVisitor::visit( Expression & ast_node )
+{
+  std::cerr << "Error: The Expression method should never be called!" << std::endl;
+}
+
+void EmitASTNodeVisitor::visit( Routine & ast_node )
+{
+  std::cerr << "Error: The Routine method should never be called!" << std::endl;
+}

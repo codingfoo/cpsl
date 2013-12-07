@@ -17,9 +17,11 @@ public:
   virtual void visit( Program & ast_node );
   virtual void visit( StatementList & ast_node );
   virtual void visit( Statement & ast_node );
+  virtual void visit( FunctionCall & ast_node );
   virtual void visit( StopStatement & ast_node );
   virtual void visit( ReadStatement & ast_node );
   virtual void visit( WriteStatement & ast_node );
+  virtual void visit( NullStatement & ast_node );
   virtual void visit( IfStatement & ast_node );
   virtual void visit( Function & ast_node );
   virtual void visit( Routine & ast_node );

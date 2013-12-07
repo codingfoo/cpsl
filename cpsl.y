@@ -8,8 +8,10 @@
 #define YY_TYPEDEF_YY_SCANNER_T
 #include "ast/ast_node.h"
 #include "ast/program.h"
+#include "ast/function_call.h"
 #include "ast/statement_list.h"
 #include "ast/statement.h"
+#include "ast/null_statement.h"
 #include "ast/write_statement.h"
 #include "ast/read_statement.h"
 #include "ast/stop_statement.h"
@@ -53,6 +55,8 @@ void yyerror(const char *s);
 #include "ast/program.h"
 #include "ast/statement_list.h"
 #include "ast/statement.h"
+#include "ast/null_statement.h"
+#include "ast/function_call.h"
 #include "ast/write_statement.h"
 #include "ast/read_statement.h"
 #include "ast/stop_statement.h"
@@ -86,11 +90,13 @@ Program* root;
   Statement* statement;
   ReadStatement* read_statement;
   WriteStatement* write_statement;
-  StopStatement* stop_statment;
+  StopStatement* stop_statement;
   IfStatement* if_statement;
   Function* function;
+  NullStatement* null_statement;
   RoutineList* routine_list;
   ExpressionList* expression_list;
+  FunctionCall* function_call;
   Expression* expression;
   Constant* constant;
   IntegerConstant* integer_constant;
@@ -165,6 +171,8 @@ Program* root;
 %type <identifier> ident_list
 %type <identifier> lvalue
 %type <identifier> inner_read
+%type <function_call> procedurecall
+%type <null_statement> nullstatement
 
 /* highest precedence -> lowest on the screen */
 %left '|'
@@ -290,12 +298,12 @@ statement: assignment
            | whilestatement
            | repeatstatement
            | forstatement
-           | stopstatement { $$ = new StopStatement(); }
+           | stopstatement { $$ = $1; }
            | returnstatement
            | readstatement { $$ = $1; }
            | writestatement { $$ = $1; }
-           | procedurecall
-           | nullstatement
+           | procedurecall { $$ = $1; }
+           | nullstatement { $$ = $1; }
            ;
 
 assignment: lvalue ASSIGNS_OPERATOR expression
@@ -316,16 +324,19 @@ else: ELSE_KEYWORD statement_sequence
       |
       ;
 
-whilestatement: WHILE_KEYWORD expression DO_KEYWORD statement_sequence END_KEYWORD;
+whilestatement: WHILE_KEYWORD expression DO_KEYWORD statement_sequence END_KEYWORD
+                ;
 
-repeatstatement: REPEAT_KEYWORD statement_sequence UNTIL_KEYWORD expression;
+repeatstatement: REPEAT_KEYWORD statement_sequence UNTIL_KEYWORD expression
+                 ;
 
 forstatement: FOR_KEYWORD IDENTIFIER ASSIGNS_OPERATOR expression TO_KEYWORD expression DO_KEYWORD statement_sequence END_KEYWORD
               | FOR_KEYWORD IDENTIFIER ASSIGNS_OPERATOR expression DOWNTO_KEYWORD expression DO_KEYWORD statement_sequence END_KEYWORD
               ;
 
 
-stopstatement: STOP_KEYWORD;
+stopstatement: STOP_KEYWORD { $$ = new StopStatement(); }
+               ;
 
 returnstatement: RETURN_KEYWORD
                  | RETURN_KEYWORD expression
@@ -345,10 +356,12 @@ inner_write: expression { $$ = new ExpressionList(); $$->push_back($1); }
              | inner_write ',' expression { $$->push_back($3); }
              ;
 
-procedurecall: IDENTIFIER '(' inner_write ')'
-               | IDENTIFIER'(' ')';
+procedurecall: IDENTIFIER '(' inner_write ')' { $$ = new FunctionCall(*$1); }
+               | IDENTIFIER'(' ')' { $$ = new FunctionCall(*$1); }
+               ;
 
-nullstatement: ;
+nullstatement: { $$ = new NullStatement(); }
+               ;
 
 expression: expression '|' expression
             | expression '&' expression
@@ -418,17 +431,17 @@ int main(int argc, char* argv[]) {
   }
   // yydebug = 1;
 
-  std::cout << "before parse" << std::endl;
+  //std::cout << "before parse" << std::endl;
 
   yyparse();
 
-  std::cout << "after parse" << std::endl;
+  //std::cout << "after parse" << std::endl;
 
   EmitASTNodeVisitor vs;
 
   root->accept(vs);
 
-  std::cout << "after visit" << std::endl;
+  //std::cout << "after visit" << std::endl;
 
   if( verbose )
   {
