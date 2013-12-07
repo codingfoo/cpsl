@@ -15,6 +15,7 @@ public:
   explicit EmitASTNodeVisitor();
   ~EmitASTNodeVisitor();
   virtual void visit( Program & ast_node );
+  virtual void visit( IdentifierList & ast_node );
   virtual void visit( StatementList & ast_node );
   virtual void visit( Statement & ast_node );
   virtual void visit( FunctionCall & ast_node );

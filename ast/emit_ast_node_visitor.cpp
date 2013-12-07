@@ -94,10 +94,6 @@ void EmitASTNodeVisitor::visit( StatementList & ast_node )
   // std::cout << std::endl;
 }
 
-void EmitASTNodeVisitor::visit( Statement & ast_node )
-{
-  std::cerr << "Error: The Statement method should never be called!" << std::endl;
-}
 
 void EmitASTNodeVisitor::visit( IfStatement & ast_node )
 {
@@ -242,11 +238,18 @@ void EmitASTNodeVisitor::visit( StringConstant & ast_node )
   emitCode("la  $t0, " + metadata.label );
 }
 
+void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
+
 void EmitASTNodeVisitor::visit( Identifier & ast_node )
 {
   //std::cout << "Identifier"<< std::endl;
 }
-void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
+
+void EmitASTNodeVisitor::visit( IdentifierList & ast_node )
+{
+  //std::cout << "Identifier"<< std::endl;
+}
+
 void EmitASTNodeVisitor::visit( StopStatement & ast_node )
 {
   emitCode("j main_end  #Stop statement");
@@ -277,8 +280,11 @@ void EmitASTNodeVisitor::visit( RoutineList & ast_node )
   }
 }
 
-void EmitASTNodeVisitor::visit( NullStatement & ast_node )
+void EmitASTNodeVisitor::visit( NullStatement & ast_node ) { }
+
+void EmitASTNodeVisitor::visit( Statement & ast_node )
 {
+  std::cerr << "Error: The Statement method should never be called!" << std::endl;
 }
 
 void EmitASTNodeVisitor::visit( ExpressionList & ast_node )

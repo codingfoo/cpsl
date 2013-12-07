@@ -10,6 +10,7 @@
 #include "ast/program.h"
 #include "ast/function_call.h"
 #include "ast/statement_list.h"
+#include "ast/identifier_list.h"
 #include "ast/statement.h"
 #include "ast/null_statement.h"
 #include "ast/write_statement.h"
@@ -53,6 +54,7 @@ void yyerror(const char *s);
 #include "symbol_table/symbol_table.h"
 #include "ast/ast_node.h"
 #include "ast/program.h"
+#include "ast/identifier_list.h"
 #include "ast/statement_list.h"
 #include "ast/statement.h"
 #include "ast/null_statement.h"
@@ -96,6 +98,7 @@ bool global=true;
   Function* function;
   NullStatement* null_statement;
   RoutineList* routine_list;
+  IdentifierList* identifier_list;
   ExpressionList* expression_list;
   FunctionCall* function_call;
   Expression* expression;
@@ -169,7 +172,7 @@ bool global=true;
 %type <identifier> simple_type
 %type <identifier> type
 %type <identifier> ident_list_decl
-%type <identifier> ident_list
+%type <identifier_list> ident_list
 %type <identifier> lvalue
 %type <identifier> inner_read
 %type <function_call> procedurecall
@@ -222,12 +225,12 @@ type_statement: IDENTIFIER '=' type ';'
                 | type_statement IDENTIFIER '=' type ';'
                 ;
 
-type: simple_type { $$ = $1; }
+type: simple_type
       | record_type
       | array_type
       ;
 
-simple_type: IDENTIFIER { $$ = $1; }
+simple_type: IDENTIFIER
              ;
 
 record_type: RECORD_KEYWORD record_type_statement END_KEYWORD
@@ -236,9 +239,17 @@ record_type: RECORD_KEYWORD record_type_statement END_KEYWORD
 ident_list_decl: ident_list ':' type ';' {
 if( global )
 {
-Symbol_Table::getInstance().addSymbol($1->getValue(), $3->getValue());
+/*
+  Symbol_Metadata metadata = SymbolMetadataInitilizer;
+  metadata.label = $2->getValue();
+  metadata.value = $4->getConstantValue();
+  Symbol_Table::getInstance().addSymbol($2->getValue(), metadata );
+  //Symbol_Table::getInstance().addSymbol($1->getValue(), $3->getValue());
+$$ = $1;
+*/
 }
-$$ = $1; }
+
+}
                  ;
 
 record_type_statement: ident_list_decl
@@ -247,8 +258,8 @@ record_type_statement: ident_list_decl
                        ;
 
 
-ident_list: IDENTIFIER { $$ = $1; }
-            | ident_list ',' IDENTIFIER
+ident_list: IDENTIFIER { $$ = new IdentifierList(); $$->push_back($1); }
+            | ident_list ',' IDENTIFIER { $$->push_back($3); }
             ;
 
 array_type: ARRAY_KEYWORD '[' const_expression ':' const_expression ']' OF_KEYWORD type

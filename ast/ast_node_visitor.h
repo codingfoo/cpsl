@@ -15,6 +15,7 @@ class Routine;
 class RoutineList;
 class ExpressionList;
 class Expression;
+class IdentifierList;
 class IdentifierExpression;
 class GTExpression;
 class AddExpression;
@@ -31,6 +32,7 @@ class ASTNodeVisitor
 {
 public:
   virtual void visit( Program & ast_node ) = 0;
+  virtual void visit( IdentifierList &ast_node ) = 0;
   virtual void visit( StatementList &ast_node ) = 0;
   virtual void visit( Statement &ast_node ) = 0;
   virtual void visit( StopStatement &ast_node ) = 0;
