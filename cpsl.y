@@ -144,6 +144,7 @@ Program* root;
 %type <program> program
 %type <statement_list> statement_sequence
 %type <statement_list> block
+%type <statement_list> body
 %type <statement> statement
 %type <stop_statement> stopstatement
 %type <read_statement> readstatement
@@ -154,7 +155,9 @@ Program* root;
 %type <routine_list> routine
 %type <expression> expression
 %type <identifier> function_ident
+%type <identifier> procedure_ident
 %type <function> function_decl
+%type <function> procedure_decl
 %type <constant> const_expression
 %type <identifier> simple_type
 %type <identifier> type
@@ -245,25 +248,25 @@ var_statement: ident_list_decl
                | var_statement ident_list_decl
                ;
 
-routine: procedure_decl
+routine: procedure_decl { $$ = new RoutineList(); $$->push_back($1); }
          | function_decl { $$ = new RoutineList(); $$->push_back($1); }
-         | routine procedure_decl
+         | routine procedure_decl { $$->push_back($2); }
          | routine function_decl { $$->push_back($2); }
          | { $$ = new RoutineList(); }
          ;
 
-procedure_ident: PROCEDURE_KEYWORD IDENTIFIER
+procedure_ident: PROCEDURE_KEYWORD IDENTIFIER { $$ = $2; }
                  ;
 
 procedure_decl: procedure_ident '(' formal_parameters ')' ';' FORWARD_KEYWORD ';'
-                | procedure_ident '(' formal_parameters ')' ';' body ';'
+                | procedure_ident '(' formal_parameters ')' ';' body ';' { $$ = new Function(*$1, *$6); }
                 ;
 
 function_ident: FUNCTION_KEYWORD IDENTIFIER { $$ = $2; }
                 ;
 
 function_decl: function_ident '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
-               | function_ident '(' formal_parameters ')' ':' type ';' body ';' { $$ = new Function(*$1); }
+               | function_ident '(' formal_parameters ')' ':' type ';' body ';' { $$ = new Function(*$1, *$8); }
                ;
 
 formal_parameters: VAR_KEYWORD ident_list ':' type
@@ -272,7 +275,8 @@ formal_parameters: VAR_KEYWORD ident_list ':' type
                    |
                    ;
 
-body: constant_decl type_decl var_decl block ;
+body: constant_decl type_decl var_decl block { $$ = $4; }
+      ;
 
 block: BEGIN_KEYWORD statement_sequence END_KEYWORD { $$ = $2; }
        ;

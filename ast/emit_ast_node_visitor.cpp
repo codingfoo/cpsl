@@ -255,7 +255,9 @@ void EmitASTNodeVisitor::visit( IdentifierExpression & ast_node )
 
 void EmitASTNodeVisitor::visit( Function & ast_node )
 {
-  std::cout << ast_node.getName() << std::endl;
+  emitLabel(ast_node.getName() + ':');
+  ast_node.getStatementList().accept(*this);
+  emitCode("jr $ra");
 }
 
 void EmitASTNodeVisitor::visit( Routine & ast_node )
