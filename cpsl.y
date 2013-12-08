@@ -193,12 +193,14 @@ bool global=true;
 %type <function_call> procedurecall
 %type <null_statement> nullstatement
 %type <pair> ident_list_decl
+%type <pair> formal_ident_list_decl
 %type <pair_list> record_type_statement
 %type <pair_list> record_type
 %type <array_pair> array_type
 %type <type> type
 %type <var_list> var_statement
 %type <var_list> var_decl
+%type <var_list> formal_parameters
 
 /* highest precedence -> lowest on the screen */
 %left '|'
@@ -303,20 +305,43 @@ procedure_ident: PROCEDURE_KEYWORD IDENTIFIER { $$ = $2; }
                  ;
 
 procedure_decl: procedure_ident '(' formal_parameters ')' ';' FORWARD_KEYWORD ';'
-                | procedure_ident '(' formal_parameters ')' ';' body ';' {  $$ = $6; $$->setIdentifier(*$1); }
+                | procedure_ident '(' formal_parameters ')' ';' body ';' {  $$ = $6; $$->setIdentifier(*$1); $$->setArgs(*$3); }
                 ;
 
 function_ident: FUNCTION_KEYWORD IDENTIFIER { $$ = $2; }
                 ;
 
 function_decl: function_ident '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
-               | function_ident '(' formal_parameters ')' ':' type ';' body ';' { $$ = $8; $$->setIdentifier(*$1); }
+               | function_ident '(' formal_parameters ')' ':' type ';' body ';' { $$ = $8; $$->setIdentifier(*$1); $$->setArgs(*$3); }
                ;
 
-formal_parameters: VAR_KEYWORD ident_list ':' type
-                   | ident_list ':' type
-                   | formal_parameters ident_list ':' type
-                   |
+formal_ident_list_decl: ident_list ':' type { $$ = new std::pair<std::vector<Identifier*>, std::string>(*$1, $3->getValue()); }
+                        ;
+
+formal_parameters: VAR_KEYWORD formal_ident_list_decl {
+  $$ = new std::vector<std::pair<std::string, std::string>>();
+  for (auto it = $2->first.begin(); it != $2->first.end(); it++)
+  {
+    $$->push_back( std::pair<std::string, std::string>((*it)->getValue(), $2->second) );
+  }
+}
+                   | formal_ident_list_decl {
+  $$ = new std::vector<std::pair<std::string, std::string>>();
+  for (auto it = $1->first.begin(); it != $1->first.end(); it++)
+  {
+    $$->push_back( std::pair<std::string, std::string>((*it)->getValue(), $1->second) );
+  }
+}
+                   | formal_parameters formal_ident_list_decl {
+  $$ = new std::vector<std::pair<std::string, std::string>>();
+  for (auto it = $2->first.begin(); it != $2->first.end(); it++)
+  {
+    $$->push_back( std::pair<std::string, std::string>((*it)->getValue(), $2->second) );
+  }
+}
+                   | {
+  $$ = new std::vector<std::pair<std::string, std::string>>();
+  }
                    ;
 
 body: constant_decl type_decl var_decl block { $$ = new Function(*$4, *$3); }

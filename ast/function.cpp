@@ -19,9 +19,19 @@ void Function::setIdentifier(Identifier & ident)
   _ident = ident;
 }
 
+void Function::setArgs(Vars args)
+{
+  _args = args;
+}
+
 std::string Function::getName()
 {
   return _ident.getValue();
+}
+
+Vars& Function::getArgs()
+{
+  return _args;
 }
 
 Vars& Function::getVars()

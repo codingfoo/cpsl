@@ -48,6 +48,7 @@ private:
   std::ofstream asmfile;
   int constantCounter;
   int ifCounter;
+  std::string currentFunc;
 };
 
 #endif //__EMIT_AST_NODE_VISITOR

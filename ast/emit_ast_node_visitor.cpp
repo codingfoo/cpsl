@@ -29,6 +29,7 @@ EmitASTNodeVisitor::EmitASTNodeVisitor()
   asmfile.open("./output.asm", std::ios::trunc);
   constantCounter = 0;
   ifCounter = 0;
+  currentFunc = "";
 }
 
 EmitASTNodeVisitor::~EmitASTNodeVisitor()
@@ -135,13 +136,13 @@ void EmitASTNodeVisitor::visit( ReadStatement & ast_node )
   {
     emitCode("li  $v0, 5  #Read integer"); // load appropriate system call code into register $v0
     emitCode("syscall"); // make syscall
-    emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
+    emitCode("sw  $v0, " + currentFunc + ast_node.getIdentifier().getValue());
   }
   else
   {
     emitCode("li  $v0, 12  #Read char"); // load appropriate system call code into register $v0
     emitCode("syscall"); // make syscall
-    emitCode("sw  $v0, " + ast_node.getIdentifier().getValue());
+    emitCode("sw  $v0, " + currentFunc + ast_node.getIdentifier().getValue());
   }
 }
 
@@ -252,12 +253,18 @@ void EmitASTNodeVisitor::visit( IntegerConstant & ast_node )
 
 void EmitASTNodeVisitor::visit( StringConstant & ast_node )
 {
-  Symbol_Metadata metadata = SymbolMetadataInitilizer;
-  metadata.type = CPSL_STRING;
-  metadata.label = "constant" + std::to_string(constantCounter++);
-  metadata.value = ast_node.getValue();
-  Symbol_Table::getInstance().addSymbol(ast_node.getValue(), metadata );
-  emitCode("la  $t0, " + metadata.label );
+  if(!Symbol_Table::getInstance().getSymbolTable().count(ast_node.getValue()))
+  {
+    Symbol_Metadata metadata = SymbolMetadataInitilizer;
+    metadata.type = CPSL_STRING;
+    metadata.label = "constant" + std::to_string(constantCounter);
+    metadata.value = ast_node.getValue();
+    std::cout << constantCounter << std::endl;
+    std::cout << metadata.value << std::endl;
+    Symbol_Table::getInstance().addSymbol(ast_node.getValue(), metadata );
+    emitCode("la  $t0, " + metadata.label );
+    constantCounter++;
+  }
 }
 
 void EmitASTNodeVisitor::visit( CharConstant & ast_node ) {}
@@ -284,9 +291,38 @@ void EmitASTNodeVisitor::visit( IdentifierExpression & ast_node )
 
 void EmitASTNodeVisitor::visit( Function & ast_node )
 {
+  currentFunc = ast_node.getName();
   emitLabel(ast_node.getName() + ':');
   ast_node.getStatementList().accept(*this);
   emitCode("jr $ra");
+
+  Symbol_Metadata meta;
+  emitHeader(".data");
+  for (auto it = ast_node.getVars().begin(); it != ast_node.getVars().end(); it++)
+  {
+    meta = Symbol_Table::getInstance().getTypeTable()[it->second];
+    if(it->second == "integer")
+    {
+      emitData( ast_node.getName() + it->first, meta.type, "0" );
+    }
+    else
+    {
+      emitData( ast_node.getName() + it->first, CPSL_UDT, "4" );
+    }
+  }
+  for (auto it = ast_node.getArgs().begin(); it != ast_node.getArgs().end(); it++)
+  {
+    meta = Symbol_Table::getInstance().getTypeTable()[it->second];
+    if(it->second == "integer")
+    {
+      emitData( ast_node.getName() + it->first, meta.type, "0" );
+    }
+    else
+    {
+      emitData( ast_node.getName() + it->first, CPSL_UDT, "4" );
+    }
+  }
+  emitHeader(".text");
 }
 
 void EmitASTNodeVisitor::visit( FunctionCall & ast_node )

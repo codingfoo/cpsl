@@ -18,11 +18,14 @@ public:
   StatementList& getStatementList();
   std::string getName();
   void setIdentifier(Identifier & ident);
+  void setArgs(Vars args);
+  Vars& getArgs();
   Vars& getVars();
 private:
   Identifier _ident;
   StatementList _sl;
   Vars _vars;
+  Vars _args;
 };
 
 #endif // __FUNCTION_H
