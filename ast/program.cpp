@@ -11,3 +11,8 @@ RoutineList& Program::getRoutineList()
 {
   return _rl;
 }
+
+Vars& Program::getVars()
+{
+  return _vars;
+}

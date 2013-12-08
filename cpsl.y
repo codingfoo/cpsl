@@ -1,4 +1,4 @@
-%verbose
+ %verbose
 %debug
 %error-verbose
 
@@ -119,6 +119,7 @@ bool global=true;
   StringConstant* string_constant;
   Identifier* identifier;
   Type * type;
+  std::vector<std::pair<std::string, std::string>>* var_list;
   std::vector<Identifier*>* ident_vector;
   std::pair<std::vector<Identifier*>, std::string>* pair;
   std::vector<std::pair<std::vector<Identifier*>, std::string> *>* pair_list;
@@ -170,7 +171,7 @@ bool global=true;
 %type <program> program
 %type <statement_list> statement_sequence
 %type <statement_list> block
-%type <statement_list> body
+%type <function> body
 %type <statement> statement
 %type <stop_statement> stopstatement
 %type <read_statement> readstatement
@@ -196,6 +197,8 @@ bool global=true;
 %type <pair_list> record_type
 %type <array_pair> array_type
 %type <type> type
+%type <var_list> var_statement
+%type <var_list> var_decl
 
 /* highest precedence -> lowest on the screen */
 %left '|'
@@ -215,7 +218,7 @@ program: constant_decl
          var_decl
          routine
          block
-         '.' { $$ = new Program(*$5, *$4); root = $$; }
+         '.' { $$ = new Program(*$5, *$4, *$3); root = $$; }
          ;
 
 constant_decl: CONST_KEYWORD const_statement
@@ -270,12 +273,23 @@ ident_list: IDENTIFIER { $$ = new std::vector<Identifier*>(); $$->push_back($1);
 array_type: ARRAY_KEYWORD '[' const_expression ':' const_expression ']' OF_KEYWORD type { $$ = new std::pair<int, std::string>(std::stoi(Symbol_Table::getInstance().getSymbolTable().at($5->getConstantValue()).value, 0, 0), $8->getValue()); }
             ;
 
-var_decl: VAR_KEYWORD var_statement  { global=false; }
-          |  { global=false;}
+var_decl: VAR_KEYWORD var_statement  { global=false; $$ = $2; }
+          |  { global=false; $$ = new std::vector<std::pair<std::string, std::string>>(); }
           ;
 
-var_statement: ident_list_decl
-               | var_statement ident_list_decl
+var_statement: ident_list_decl {
+  $$ = new std::vector<std::pair<std::string, std::string>>();
+  for (auto it = $1->first.begin(); it != $1->first.end(); it++)
+  {
+    $$->push_back( std::pair<std::string, std::string>((*it)->getValue(), $1->second) );
+  }
+}
+               | var_statement ident_list_decl {
+  for (auto it = $2->first.begin(); it != $2->first.end(); it++)
+  {
+    $$->push_back( std::pair<std::string, std::string>((*it)->getValue(), $2->second) );
+  }
+               }
                ;
 
 routine: procedure_decl { $$ = new RoutineList(); $$->push_back($1); }
@@ -289,14 +303,14 @@ procedure_ident: PROCEDURE_KEYWORD IDENTIFIER { $$ = $2; }
                  ;
 
 procedure_decl: procedure_ident '(' formal_parameters ')' ';' FORWARD_KEYWORD ';'
-                | procedure_ident '(' formal_parameters ')' ';' body ';' { $$ = new Function(*$1, *$6); }
+                | procedure_ident '(' formal_parameters ')' ';' body ';' { $$->setIdentifier(*$1); }
                 ;
 
 function_ident: FUNCTION_KEYWORD IDENTIFIER { $$ = $2; }
                 ;
 
 function_decl: function_ident '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
-               | function_ident '(' formal_parameters ')' ':' type ';' body ';' { $$ = new Function(*$1, *$8); }
+               | function_ident '(' formal_parameters ')' ':' type ';' body ';' { $$->setIdentifier(*$1); }
                ;
 
 formal_parameters: VAR_KEYWORD ident_list ':' type
@@ -305,7 +319,7 @@ formal_parameters: VAR_KEYWORD ident_list ':' type
                    |
                    ;
 
-body: constant_decl type_decl var_decl block { $$ = $4; }
+body: constant_decl type_decl var_decl block { $$ = new Function(*$4, *$3); }
       ;
 
 block: BEGIN_KEYWORD statement_sequence END_KEYWORD { $$ = $2; }

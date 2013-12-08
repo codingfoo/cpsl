@@ -7,6 +7,7 @@
 
 class Identifier : public ASTNode {
 public:
+  Identifier() {}
   explicit Identifier(std::string value) : _value(value) {}
   void accept(ASTNodeVisitor &v);
   friend std::ostream& operator<< (std::ostream &out, const Identifier &obj);

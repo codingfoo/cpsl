@@ -17,7 +17,6 @@ void RecordType::setIdent(std::string identifier)
 {
   Symbol_Metadata metadata = SymbolMetadataInitilizer;
   metadata.type = CPSL_UDT;
-  metadata.record_elements.size();
   for (auto it = _record.begin(); it != _record.end(); it++)
   {
     for (auto idents = (*it)->first.begin(); idents != (*it)->first.end(); idents++)
