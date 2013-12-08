@@ -303,14 +303,14 @@ procedure_ident: PROCEDURE_KEYWORD IDENTIFIER { $$ = $2; }
                  ;
 
 procedure_decl: procedure_ident '(' formal_parameters ')' ';' FORWARD_KEYWORD ';'
-                | procedure_ident '(' formal_parameters ')' ';' body ';' { $$->setIdentifier(*$1); }
+                | procedure_ident '(' formal_parameters ')' ';' body ';' {  $$ = $6; $$->setIdentifier(*$1); }
                 ;
 
 function_ident: FUNCTION_KEYWORD IDENTIFIER { $$ = $2; }
                 ;
 
 function_decl: function_ident '(' formal_parameters ')' ':' type ';' FORWARD_KEYWORD ';'
-               | function_ident '(' formal_parameters ')' ':' type ';' body ';' { $$->setIdentifier(*$1); }
+               | function_ident '(' formal_parameters ')' ':' type ';' body ';' { $$ = $8; $$->setIdentifier(*$1); }
                ;
 
 formal_parameters: VAR_KEYWORD ident_list ':' type

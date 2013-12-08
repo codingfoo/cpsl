@@ -13,7 +13,7 @@ typedef std::vector<std::pair<std::string, std::string>> Vars;
 
 class Program : public ASTNode {
 public:
-  explicit Program(StatementList& statements, RoutineList& routines, Vars vars) : _sl(statements), _rl(routines), _vars(vars) {}
+  explicit Program(StatementList& statements, RoutineList& routines, Vars& vars) : _sl(statements), _rl(routines), _vars(vars) {}
   void accept(ASTNodeVisitor &v);
   StatementList& getStatementList();
   RoutineList& getRoutineList();
