@@ -29,6 +29,7 @@ public:
   void setVerbose();
 
   Symbol_Map& getSymbolTable();
+  Symbol_Map& getTypeTable();
   friend std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table);
 
 private:

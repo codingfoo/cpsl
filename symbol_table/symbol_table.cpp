@@ -62,6 +62,11 @@ Symbol_Map& Symbol_Table::getSymbolTable()
   return _global_symbol_table;
 }
 
+Symbol_Map& Symbol_Table::getTypeTable()
+{
+  return _type_symbol_table;
+}
+
 void Symbol_Table::setVerbose()
 {
   _verbose=true;

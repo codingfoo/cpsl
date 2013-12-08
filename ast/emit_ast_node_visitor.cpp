@@ -58,6 +58,14 @@ void EmitASTNodeVisitor::emitData(std::string label, Cpsl_Base_Type type, std::s
   {
     mips_type = "asciiz";
   }
+  if(type == CPSL_UDT)
+  {
+    mips_type = "space";
+  }
+  if(type == CPSL_ARRAY)
+  {
+    mips_type = "space";
+  }
   asmfile << label << ':' << '\t' << '.' << mips_type << '\t' << data << std::endl;
 }
 
@@ -81,6 +89,20 @@ void EmitASTNodeVisitor::visit( Program & ast_node )
   for (auto it = Symbol_Table::getInstance().getSymbolTable().begin(); it != Symbol_Table::getInstance().getSymbolTable().end(); it++) {
     label = it->second.label != "" ? it->second.label : it->first;
     emitData( label , it->second.type, it->second.value );
+  }
+
+  Symbol_Metadata meta;
+  for (auto it = ast_node.getVars().begin(); it != ast_node.getVars().end(); it++)
+  {
+    meta = Symbol_Table::getInstance().getTypeTable()[it->second];
+    if(it->second == "integer")
+    {
+      emitData( it->first, meta.type, "0" );
+    }
+    else
+    {
+      emitData( it->first, CPSL_UDT, "200" );
+    }
   }
 }
 
