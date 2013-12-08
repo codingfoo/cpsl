@@ -72,3 +72,20 @@ symbols
 symbol : metadata( type scope offset value )
 
 base types: boolean, integer, char, string
+
+
+Scratch
+=======
+if( global )
+{
+/*
+  Symbol_Metadata metadata = SymbolMetadataInitilizer;
+  metadata.label = $2->getValue();
+  metadata.value = $4->getConstantValue();
+  Symbol_Table::getInstance().addSymbol($2->getValue(), metadata );
+  //Symbol_Table::getInstance().addSymbol($1->getValue(), $3->getValue());
+$$ = $1;
+*/
+}
+
+

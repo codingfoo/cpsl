@@ -24,43 +24,20 @@ std::ostream& operator<< (std::ostream &out, Symbol_Table &symbol_table)
 
 Symbol_Table::Symbol_Table() : _verbose(false)
 {
-  // Symbol_Map predefined;
+  Symbol_Metadata metadata1 = SymbolMetadataInitilizer;
+  metadata1.type = CPSL_INTEGER;
+  addType("integer", metadata1 );
 
-  // std::shared_ptr<Symbol> cpsl_int(new Type("integer", _next_offset));
-  // incrementOffset();
-  // predefined["integer"] = cpsl_int;
-  // predefined["INTEGER"] = cpsl_int;
+  Symbol_Metadata metadata2 = SymbolMetadataInitilizer;
+  metadata2.type = CPSL_CHAR;
+  addType("char", metadata2 );
 
-  // std::shared_ptr<Symbol> cpsl_char(new Type("char", _next_offset));
-  // incrementOffset();
-  // predefined["char"] = cpsl_char;
-  // predefined["CHAR"] = cpsl_char;
+  Symbol_Metadata metadata3 = SymbolMetadataInitilizer;
+  metadata3.type = CPSL_BOOLEAN;
+  addType("boolean", metadata3 );
 
-  // std::shared_ptr<Symbol> cpsl_boolean(new Type("boolean", _next_offset));
-  // incrementOffset();
-  // predefined["boolean"] = cpsl_boolean;
-  // predefined["BOOLEAN"] = cpsl_boolean;
-
-  // std::shared_ptr<Symbol> cpsl_string(new Type("string", _next_offset));
-  // incrementOffset();
-  // predefined["string"] = cpsl_string;
-  // predefined["STRING"] = cpsl_string;
-
-  // std::shared_ptr<Symbol> cpsl_true(new Type("true", _next_offset));
-  // incrementOffset();
-  // predefined["true"] = cpsl_true;
-  // predefined["TRUE"] = cpsl_true;
-
-  // std::shared_ptr<Symbol> cpsl_false(new Type("false", _next_offset));
-  // incrementOffset();
-  // predefined["false"] = cpsl_false;
-  // predefined["FALSE"] = cpsl_false;
-
-  // scoped_symbol_table.push_back(predefined);
-
-  // Symbol_Map global;
-
-  // scoped_symbol_table.push_back(global);
+  // false -> constant
+  // true -> constant
 }
 
 void Symbol_Table::addSymbol(std::string symbol, std::string type)
@@ -73,6 +50,11 @@ void Symbol_Table::addSymbol(std::string symbol, std::string type)
 void Symbol_Table::addSymbol(std::string symbol, Symbol_Metadata metadata)
 {
   _global_symbol_table[symbol] = metadata;
+}
+
+void Symbol_Table::addType(std::string symbol, Symbol_Metadata metadata)
+{
+  _type_symbol_table[symbol] = metadata;
 }
 
 Symbol_Map& Symbol_Table::getSymbolTable()

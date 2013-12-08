@@ -6,8 +6,14 @@
 
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
+#include <utility>
+#include <vector>
 #include "ast/ast_node.h"
 #include "ast/program.h"
+#include "ast/type.h"
+#include "ast/simple_type.h"
+#include "ast/record_type.h"
+#include "ast/array_type.h"
 #include "ast/function_call.h"
 #include "ast/statement_list.h"
 #include "ast/identifier_list.h"
@@ -50,10 +56,15 @@ void yyerror(const char *s);
 
 %{
 #include <cstring>
-#include "vector"
+#include <utility>
+#include <vector>
 #include "symbol_table/symbol_table.h"
 #include "ast/ast_node.h"
 #include "ast/program.h"
+#include "ast/type.h"
+#include "ast/simple_type.h"
+#include "ast/record_type.h"
+#include "ast/array_type.h"
 #include "ast/identifier_list.h"
 #include "ast/statement_list.h"
 #include "ast/statement.h"
@@ -107,6 +118,11 @@ bool global=true;
   CharConstant* char_constant;
   StringConstant* string_constant;
   Identifier* identifier;
+  Type * type;
+  std::vector<Identifier*>* ident_vector;
+  std::pair<std::vector<Identifier*>, std::string>* pair;
+  std::vector<std::pair<std::vector<Identifier*>, std::string> *>* pair_list;
+  std::pair<int, std::string>* array_pair;
 }
 
 
@@ -170,13 +186,16 @@ bool global=true;
 %type <function> procedure_decl
 %type <constant> const_expression
 %type <identifier> simple_type
-%type <identifier> type
-%type <identifier> ident_list_decl
-%type <identifier_list> ident_list
+%type <ident_vector> ident_list
 %type <identifier> lvalue
 %type <identifier> inner_read
 %type <function_call> procedurecall
 %type <null_statement> nullstatement
+%type <pair> ident_list_decl
+%type <pair_list> record_type_statement
+%type <pair_list> record_type
+%type <array_pair> array_type
+%type <type> type
 
 /* highest precedence -> lowest on the screen */
 %left '|'
@@ -221,48 +240,34 @@ type_decl: TYPE_KEYWORD type_statement
            |
            ;
 
-type_statement: IDENTIFIER '=' type ';'
-                | type_statement IDENTIFIER '=' type ';'
+type_statement: IDENTIFIER '=' type ';' { $3->setIdent($1->getValue()); }
+                | type_statement IDENTIFIER '=' type ';' { $4->setIdent($2->getValue()); }
                 ;
 
-type: simple_type
-      | record_type
-      | array_type
+type: simple_type  { $$ = new SimpleType($1->getValue()); }
+      | record_type { $$ = new RecordType(*$1); }
+      | array_type { $$ = new ArrayType(*$1); }
       ;
 
-simple_type: IDENTIFIER
+simple_type: IDENTIFIER { $$ = $1; }
              ;
 
-record_type: RECORD_KEYWORD record_type_statement END_KEYWORD
+record_type: RECORD_KEYWORD record_type_statement END_KEYWORD { $$ = $2; }
              ;
 
-ident_list_decl: ident_list ':' type ';' {
-if( global )
-{
-/*
-  Symbol_Metadata metadata = SymbolMetadataInitilizer;
-  metadata.label = $2->getValue();
-  metadata.value = $4->getConstantValue();
-  Symbol_Table::getInstance().addSymbol($2->getValue(), metadata );
-  //Symbol_Table::getInstance().addSymbol($1->getValue(), $3->getValue());
-$$ = $1;
-*/
-}
-
-}
-                 ;
-
-record_type_statement: ident_list_decl
-                       | record_type_statement ident_list_decl
+record_type_statement: ident_list_decl { $$ = new std::vector<std::pair<std::vector<Identifier*>, std::string> *>(); $$->push_back($1);}
+                       | record_type_statement ident_list_decl {$$->push_back($2);}
                        |
                        ;
 
+ident_list_decl: ident_list ':' type ';' { $$ = new std::pair<std::vector<Identifier*>, std::string>(*$1, $3->getValue()); }
+                        ;
 
-ident_list: IDENTIFIER { $$ = new IdentifierList(); $$->push_back($1); }
+ident_list: IDENTIFIER { $$ = new std::vector<Identifier*>(); $$->push_back($1); }
             | ident_list ',' IDENTIFIER { $$->push_back($3); }
             ;
 
-array_type: ARRAY_KEYWORD '[' const_expression ':' const_expression ']' OF_KEYWORD type
+array_type: ARRAY_KEYWORD '[' const_expression ':' const_expression ']' OF_KEYWORD type { $$ = new std::pair<int, std::string>(std::stoi(Symbol_Table::getInstance().getSymbolTable().at($5->getConstantValue()).value, 0, 0), $8->getValue()); }
             ;
 
 var_decl: VAR_KEYWORD var_statement  { global=false; }
