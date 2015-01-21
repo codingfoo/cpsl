@@ -1,0 +1,33 @@
+TODO
+====
+expressions
+  :=
+  <>
+  =
+  <
+  <=
+symbol table( how to handle scopes? )
+statements
+control structures
+  for
+  elseif
+  else
+  repeat
+  while
+udt
+function calls
+move main into seperate file
+add options parser(gnuopt)
+     verbose
+     debug
+     in file / std in (set yyin rather than )
+     out file
+mixed pointers
+
+
+read multiple values
+write characters
+stop non main stop
+
+error message for newline in string
+error message no double quote in string constant(no escape)
